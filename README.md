@@ -3,7 +3,9 @@
 This repository contains scripts that may be helpful when working with the [Decombinator](https://github.com/innate2adaptive/Decombinator) software.
 
 <h3 id="top">Navigation:</h3>
+
 * [Test Data Generator](#test-data-generator)
+
 ---
 
 <h1 id="test-data-generator">Test Data Generator</h1>
@@ -27,16 +29,27 @@ python test-data-generator.py -h
 #### Input Arguments
 
 `-d`   - change the name of the output directory for the test data
+
 `-rl`  - change the read length of the output sequences (before barcoding)
+
 `-n`   - change the total number of output reads per chain
+
 `-v`   - choose whether to produce dual tag or single tag output data
+
 `-mc`  - produces a single output file of mixed alpha and beta chain TCRs
+
 `-nbc` - choose to produce non-barcoded data
+
 `-bl`  - change the length of the attached barcode
+
 `-it`  - provide a percentage value for how many of the reads contain TCR sequences
+
 `-ie`  - provide a percentage value for how many tags contain one "sequencing" error
+
 `-mt`  - provide a percentage value for how many alpha and beta tags will have an overlapping match in single tag mode
+
 `-tf`  - direct the script to the local directory where tag files are stored. Useful for offline work. By default the script will first attempt to download the tags from the [Decombinator-Tags-FASTAs](https://github.com/innate2adaptive/Decombinator-Tags-FASTAs) directory.
+
 `-or`  - change the orientation of the output reads, 'reverse', 'forward', or 'both' (50% forward and 50% reverse)
 
 #### Examples
