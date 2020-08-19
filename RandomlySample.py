@@ -144,7 +144,8 @@ if __name__ == '__main__':
       else:
         outfilename = inputargs['prefix'] + inbasefile + '.gz'
 
-      outfilename = os.sep.join([inbasepath, outfilename])
+      if not inbasepath=="":
+        outfilename = os.sep.join([inbasepath, outfilename])
     
     # Test whether infile present
       # FIX
@@ -167,8 +168,7 @@ if __name__ == '__main__':
         
     # Open infile, determine type, read into list and sample
       # fq, misc dcr files and n12 files are not collapsed, in that they contain no frequency information (every line is a unique entry)
-      # Everythin that has been collapsed (freq, cdr3, np, dcrcdr3) has a final comma-delimited frequency file, therefore need to be weighted accordingly
-      
+      # Everything that has been collapsed (freq, cdr3, np, dcrcdr3) has a final comma-delimited frequency file, therefore need to be weighted accordingly
     with in_opener(inputargs['infile'],"rt") as infile, out_opener(outfilename, 'wt') as outfile:
       
       print("Reading in data from", inputargs['infile'])
@@ -237,8 +237,6 @@ if __name__ == '__main__':
       
       # Check for existing date-stamped file
       samplenam = inbasefile.split(".")[0]
-      from IPython import embed
-      embed()
       summaryname = "Logs/" + date + "_" + samplenam + "_Subsampling_Summary.csv"
       if not os.path.exists(summaryname): 
         summaryfile = open(summaryname, "wt")
