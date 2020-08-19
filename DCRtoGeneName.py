@@ -1,5 +1,9 @@
 # DCRtoGeneName.py 
 # March 2016, Jamie Heather, UCL
+# Updated August 2020, Thomas Peacock, UCL
+
+# Updates:
+  # Updated to Python 3
 
 # Take a file containing a DCR identifier in its first 5 comma-delimited fields (e.g. n12, freq or dcrcdr3) and convert the first two to the actual gene name
 
