@@ -43,6 +43,10 @@ import fileinput
 
 pathToLogs = str(sys.argv[1]) # full path to Logs folder
 
+# add slash to end of path if it is not supplied by user
+if pathToLogs[-1] != "/":
+  pathToLogs+="/"
+
 onlyfiles = [f for f in listdir(pathToLogs) if isfile(join(pathToLogs, f))]
 
 sampleNam = []
