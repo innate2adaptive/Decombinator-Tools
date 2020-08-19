@@ -6,10 +6,10 @@ This repository contains scripts that may be helpful when working with the [Deco
 
 * [Test Data Generator](#test-data-generator)
 * [Log Summary](#log-summary)
+* [DCR to Gene Name](#dcr-to-gene)
 * [Recipes](#recipes)
 
 ---
-
 <h1 id="test-data-generator">Test Data Generator</h1>
 
 The automatic test data generator can be used to produce customised FASTQ files to use as test input data for use with the [Decombinator Script](https://github.com/innate2adaptive/Decombinator#decombinator). This script should be run using **Python 2**.
@@ -80,6 +80,27 @@ The output csv file contains the following fields:
 | AverageInputTCRAbundance |
 | AverageOutputTCRAbundance |
 | AverageRNAduplication |
+
+<h1 id="dcr-to-gene">DCR to Gene Name</h1>
+
+The first five comma-delimited fields in a Decombinator or Collapsinator output file are referred to as the DCR identifier. The first two of these five fields are integer indices that correspond to V and J genes.
+
+The `DCRtoGeneName` script reads in a file containing a DCR identifier and converts these first two V and J indices to the real gene name. The output (path and) file name is the same as the input name, but has prefixes the file extension with `tr_` e.g. `example.n12.gz` will convert to `example.tr_n12.gz`.
+
+How to run:
+```
+python DCRtoGeneName.py -in path/to/input_alpha_file.n12.gz 
+```
+
+If chain name is not present in the input file name, it should be supplied by the user, e.g. : 
+```
+python DCRtoGeneName.py -in path/to/input_file.freq -c beta 
+```
+
+The default species for this script is assumed to be human, but can be changed with the `-sp` argument, e.g. `-sp mouse`. A full list of additional arguments can be viewed by running:
+```
+python DCRtoGeneName.py -h
+```
 
 <h1 id="recipes">Recipes</h1>
 
