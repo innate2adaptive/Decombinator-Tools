@@ -59,6 +59,8 @@ python TestDataGenerator.py -nbc -mc -n 250 -rl 160 -d MyData
 ```
 python TestDataGenerator.py -v s -or forward -ie 40
 ```
+
+---
 <h1 id="test-data-generator">Log Summary</h1>
 
 This script will generate a summary csv file of all the data stored in the `Logs` folder within the Decombinator repository. This script is should be run in **Python 3**.
