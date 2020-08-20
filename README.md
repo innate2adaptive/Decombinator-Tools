@@ -7,6 +7,9 @@ This repository contains scripts that may be helpful when working with the [Deco
 * [Test Data Generator](#test-data-generator)
 * [Log Summary](#log-summary)
 * [DCR to Gene Name](#dcr-to-gene)
+* [Randomly Sample](#randomly-sample)
+* [Run Test Data](#run-test-data)
+* [UMI Histogram](umi-histogram)
 * [Recipes](#recipes)
 
 ---
@@ -100,6 +103,75 @@ python DCRtoGeneName.py -in path/to/input_file.freq -c beta
 The default species for this script is assumed to be human, but can be changed with the `-sp` argument, e.g. `-sp mouse`. A full list of additional arguments can be viewed by running:
 ```
 python DCRtoGeneName.py -h
+```
+
+<h1 id="randomly-sample">Randomly Sample</h1>
+
+This script can be used to randomly sub-sample a file produced from the Decombinator pipeline (.fq, .n12, .freq, .cdr3, .np, .dcrcdr3) down to a specified sample size.
+
+How to run:
+```
+python RandomlySample.py -in /path/to/infile.n12 -n 50
+```
+where the `-in` argument should be supplied with the file to be subsampled, and the `-n` argument should be supplied with the desired final sample size. The output file filename of the input file prefixed by `subsampled_`. Note that the path will not be retained, and the output file will be written to the current working directory. Similarly, the Logs file will be stored in the current working directory.
+
+To generate subsampled file and Logs file in the Decombinator directory, run from within Decombinator:
+```
+python /path/to/Decombinator-Tools/RandomlySample.py -in infile.n12 -n 50
+```
+
+A full list of arguments can be viewed by running:
+```
+python RandomlySample.py -h
+```
+
+<h1 id="run-test-data">Run Test Data</h1>
+
+This script can be used to automatically run the test data stored in the [Decombinator-Test-Data](https://github.com/innate2adaptive/Decombinator-Test-Data) repository through the Decombinator pipeline. The script assumes the directory structure shown below, where Decombinator, Decombinator-Tools, and Decombinator-Test-Data are stored in the same parent directory:
+```
++-- parent-directory
+|   +-- Decombinator
+|   +-- Decombinator-Test-Data
+|   +-- Decombinator-Tools
+|   |   +-- RunTestData.py
+```
+
+How to run:
+```
+python RunTestData.py 
+```
+Note that the output files  and Log files will be stored in the current working directory (Decombinator-Tools). To generate output and Log files in the Decombinator directory, run from within Decombinator directory:
+```
+python /path/to/Decombinator-Tools/RunTestData.py 
+```
+
+The RunTestData script can be supplied with two checkpoint arguments, `-c1` and `-c2` that tell the script at which part in the pipeline to start from and end at. For example, to the test data through only Demultiplexor and Decombinator, run:
+```
+python /path/to/Decombinator-Tools/RunTestData.py -c1 demultiplexor -c2 decombinator
+```
+or to run the test data through only Collapsinator, run:
+```
+python /path/to/Decombinator-Tools/RunTestData.py -c1 collapsinator -c2 collapsinator
+```
+
+<h1 id="umi-histogram">UMI Histogram</h1>
+
+This script can be used to generate a histogram plot displaying the frequency of average UMI cluster sizes present in collapsed TCR repertoire data. It should be run as an optional analysis tool in the Collapsinator stage of the Decombinator pipeline.
+
+If Collapsinator has been run using the `-uh` argument, a csv file will be saved to the logs folder with the suffix `_UMIhistogram.csv`. Supplying this file to the UMIHistogram script will generate the histogram.
+
+How to run:
+```
+python UMIhistogram.py -in /path/to/filename_UMIhistogram.csv
+```
+The histogram plot will be saved to the same path as the input file. To change the output file, supply the `-o` argument:
+```
+python UMIhistogram.py -in /path/to/filename_UMIhistogram.csv -o /path/to/outfile.png
+```
+
+Additional arguments include `-b` to adjust the histogram bin size, `-c` to change the colour of the histogram (supply as text, e.g. "pink", or as hexcode within quotes, e.g. "#34623F"), and `-d` to change the DPI of the output plot:
+```
+python UMIhistogram.py -in /path/to/filename_UMIhistogram.csv -b 80 -c '#34623F' -d 300
 ```
 
 <h1 id="recipes">Recipes</h1>
