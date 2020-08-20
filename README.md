@@ -69,8 +69,7 @@ python LogSummary.py /path/to/LogsFolder/ /path/to/outfile.csv
 ```
 The output csv file contains the following fields:
 
-||
-|:---:|
+| :---: |
 | sample |
 | NumberReadsInput |
 | NumberReadsDecombined |
