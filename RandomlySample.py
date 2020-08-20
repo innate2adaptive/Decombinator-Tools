@@ -26,9 +26,9 @@ def args():
     parser.add_argument(
         '-n', '--number', type=int, help='Number of lines/reads to subsample to.', required=True)  
     parser.add_argument(
-        '-s', '--suppresssummary', type=bool, help='Output summary data (True/False)', required=False, default=False)
+        '-s', '--suppresssummary', action='store_true', help='Output summary data (True/False)', required=False)
     parser.add_argument(
-        '-dz', '--dontgzip', type=bool, help='Stop the output files automatically being compressed with gzip (True/False)', required=False, default=False)
+        '-dz', '--dontgzip', action='store_true', help='Stop the output files automatically being compressed with gzip (True/False)', required=False)
     parser.add_argument(
         '-pf', '--prefix', type=str, help='Specify the filename prefix of the output files. Default = \"subsampled_\"', required=False, default='subsampled_')
     
