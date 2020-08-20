@@ -68,22 +68,7 @@ How to run:
 python LogSummary.py /path/to/LogsFolder/ /path/to/outfile.csv
 ```
 The output csv file contains the following fields:
-|             | 
-| :---------: |
-| sample |
-| NumberReadsInput |
-| NumberReadsDecombined |
-| PercentReadsDecombined |
-| UniqueDCRsPassingFilters |
-| TotalDCRsPassingFilters |
-| PercentDCRPassingFilters(withbarcode) |
-| UniqueDCRsPostCollapsing |
-| TotalDCRsPostCollapsing |
-| PercentUniqueDCRsKept |
-| PercentTotalDCRsKept |
-| AverageInputTCRAbundance |
-| AverageOutputTCRAbundance |
-| AverageRNAduplication |
+`sample` `NumberReadsInput` `NumberReadsDecombined` `PercentReadsDecombined` `UniqueDCRsPassingFilters` `TotalDCRsPassingFilters` `PercentDCRPassingFilters(withbarcode)` `UniqueDCRsPostCollapsing` `TotalDCRsPostCollapsing` `PercentUniqueDCRsKept` `PercentTotalDCRsKept` `AverageInputTCRAbundance` `AverageOutputTCRAbundance` `AverageRNAduplication`
 
 ---
 <h1 id="dcr-to-gene">DCR to Gene Name</h1>
