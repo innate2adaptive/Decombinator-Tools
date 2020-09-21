@@ -103,8 +103,11 @@ def buildHalfSeqs(readlen, v, j, match = True):
 	bases = ['A','C','G','T']
 
 	extrabases = readlen - len(v)
-	x, y = randPartition(extrabases, 2)
+#	x, y = randPartition(extrabases, 2)
+	x = (readlen - len(v) ) / 2
+	y = (readlen - len(v) ) / 2
 
+	
 	xseq = "".join([random.choice(bases) for i in range(x)])
 	yseq = "".join([random.choice(bases) for i in range(y)])
 
