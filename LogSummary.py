@@ -24,7 +24,7 @@
 
 ##### How to run #####
 
-  # python CopyPasteDcrLogVals_edited.py full/path/to/Logs/folder/ outfile.csv
+  # python LogSummary.py full/path/to/Logs/folder/ outfile.csv
 
 # NB 
   # assumes that all Log files are in one Log folder
@@ -82,6 +82,11 @@ fields = ["sample",
 out = []
 
 for i in sampleNam:
+
+    # ignore undetermined files
+    if "undetermined" in i.lower():
+      continue
+
     string = [i]
     for j in onlyfiles:
         
