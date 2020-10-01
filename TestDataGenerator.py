@@ -1,6 +1,6 @@
 import os
 import sys
-import urllib2
+import urllib.request
 import argparse
 import random
 from Bio.Seq import Seq
@@ -13,27 +13,28 @@ def args():
 	parser.add_argument('-v', '--version', type =str, choices=['s','d','S','D'], help='Choose to produce Single tag or Dual tag data. (Use \'s\' or \'d\'.)', required=False, default='d')
 	parser.add_argument('-mc', '--mixchains', action='store_true', help='Choose to produce data files with mixture of chains', required=False, default=False)
 	parser.add_argument('-nbc', '--nonbarcoding', action='store_true', help='Create data without dummy barcoding', required=False, default=False)
-	parser.add_argument('-bl', '--bclength', type=int, help='Length of dummy barcode, if applicable. Default is set to 42 bp.', required=False, default=42)
 	parser.add_argument('-it', '--incltcr', type=int, help='Percentage of reads with tcrs', required=False, default=100)
 	parser.add_argument('-ie', '--inclerr', type=int, help='Percentage of alpha and beta tags that contain 1 sequencing error', required=False, default=0)
 	parser.add_argument('-mt', '--matchtags', type=int, help='Percentage of alpha and beta tags have an overlapping match (single tag mode)', required=False, default=100)
 	parser.add_argument('-tf', '--tagfolder', type=str, help='Path to local directory where tags are stored for offline use', required=False, default='Decombinator-Tags-FASTAs')
-	parser.add_argument('-or', '--orientation', type =str,help='Choose direction for reads (forward/reverse/both', required=False, default="reverse")
+	parser.add_argument('-or', '--orientation', type =str,help='Choose direction for reads (forward/reverse/both)', required=False, default="reverse")
+	parser.add_argument('-sp', '--species', type =str,help='Choose species, human (default) or mouse', required=False, default="human")
+	parser.add_argument('-ol', '--oligo', type =str,help='Choose oligo, m13 (default) or i8', required=False, default="m13")	
 	return parser.parse_args()
 
 def argCheck(args):
 	taglength = 20 #hardcoded for now
 	if args.version.lower() == 's' and args.readlen <= taglength:
-		print "Single Tag version must have read length longer than",taglength
+		print("Single Tag version must have read length longer than",taglength)
 		sys.exit()
 	if args.version.lower() == 'd' and args.readlen <= taglength*2:
-		print "Dual Tag version must have read length longer than",taglength*2
+		print("Dual Tag version must have read length longer than",taglength*2)
 		sys.exit()
 	if not 0 <= args.incltcr <= 100:
-		print "Reads with TCR percentage must be an integer between 0 and 100."
+		print("Reads with TCR percentage must be an integer between 0 and 100.")
 		sys.exit()
 	if not 0 <= args.inclerr <= 100:
-		print "Sequencing Error percentage must be an integer between 0 and 100."
+		print("Sequencing Error percentage must be an integer between 0 and 100.")
 		sys.exit()
 
 def getTags(file,tagdir):
@@ -45,22 +46,23 @@ def getTags(file,tagdir):
 			lines = f.readlines()
 		[tags.append(l.split(" ")[0]) for l in lines]
 
-  	elif os.path.isfile(tagdir + os.sep + file):
+	elif os.path.isfile(tagdir + os.sep + file):
 		with open(tagdir + os.sep + file) as f:
 			lines = f.readlines()
 		[tags.append(l.split(" ")[0]) for l in lines]
 	
 	else:
 		try:
-			lines = urllib2.urlopen(fl).readlines()
-			[tags.append(l.split(" ")[0]) for l in lines]
-		except:
-			print "Cannot find following file locally or online:", file
-			print "Please either run with internet access, or point script to local copies of the tags with the \'-tf\' flag."
+			with urllib.request.urlopen(fl) as f:
+				lines = f.readlines()
+			for l in lines:
+				tags.append(l.decode().split(" ")[0])
+		except:		
+			print("Cannot find following file locally or online:", file)
+			print("Please either run with internet access, or point script to local copies of the tags with the \'-tf\' flag.")
 			sys.exit()
 
 	return tags
-
 
 def dataWriter(fname,data,directory):
 	if not os.path.exists(directory):
@@ -118,9 +120,19 @@ def buildHalfSeqs(readlen, v, j, match = True):
 	
 	return (xseq + v + yseq, yseq + j + xseq)
 
-def barcode(seq,bclen):
-	#create dummy barcode for decombining purposes
-	return "B"*bclen + seq
+def barcode(seq,oligo='m13'):
+	# creates random barcodes with given oligio
+	# no errors in spacers
+	oligos = {}
+	oligos['m13'] = {'spcr1': 'GTCGTGACTGGGAAAACCCTGG','spcr2':'GTCGTGAT'}
+	oligos['i8'] = {'spcr1':'GTCGTGAT','spcr2':'GTCGTGAT'}
+
+	bases = ['A','C','G','T']
+	half_bc1 = "".join([random.choice(bases) for x in range(6)])
+	half_bc2 = "".join([random.choice(bases) for x in range(6)])
+
+	bc = oligos[oligo]['spcr1'] + half_bc1 + oligos[oligo]['spcr2'] + half_bc2
+	return bc + seq
 
 def buildRead(seq, readlen, chain, orientation, version, readid, seqid):
 	read = "@Auto-Generated-Test-Data:"+chain+"chain:"
@@ -142,7 +154,7 @@ def createError(seq):
 	return seq[0:err] + random.choice(bases) + seq[err+1:]
 
 
-def buildData(tags, readlen, numreads, orientation, version, nbc, bclen, inclerr, incltcr, matchtags):
+def buildData(tags, readlen, numreads, orientation, version, nbc, inclerr, incltcr, matchtags, oligo):
 	areads = []
 	breads = []
 	version = version.upper()
@@ -154,8 +166,8 @@ def buildData(tags, readlen, numreads, orientation, version, nbc, bclen, inclerr
 			newa = "".join([random.choice(bases) for j in range(readlen)])
 			newb = "".join([random.choice(bases) for j in range(readlen)])
 			if not nbc:
-				newa = barcode(newa,bclen)
-				newb = barcode(newb,bclen)
+				newa = barcode(newa,oligo)
+				newb = barcode(newb,oligo)
 			ra = buildRead(newa ,readlen,"alpha",orientation,version,i,scount)
 			rb = buildRead(newb ,readlen,"beta",orientation,version,i,scount)
 			areads.append(ra)
@@ -193,8 +205,8 @@ def buildData(tags, readlen, numreads, orientation, version, nbc, bclen, inclerr
 			bseq = [str(Seq(s).reverse_complement()) for s in bseq]
 
 		if not nbc:
-			aseq = [barcode(s,bclen) for s in aseq]
-			bseq = [barcode(s,bclen) for s in bseq]
+			aseq = [barcode(s,oligo) for s in aseq]
+			bseq = [barcode(s,oligo) for s in bseq]
 
 		scount = 1
 		for s in aseq:
@@ -216,10 +228,19 @@ if __name__ == '__main__':
 	args = args()
 	argCheck(args)
 
-	tag_files = {"aj" : "human_extended_TRAJ.tags",
-				 "av" : "human_extended_TRAV.tags",
-				 "bj" : "human_extended_TRBJ.tags",
-				 "bv" : "human_extended_TRBV.tags"}
+	if args.species == "human":
+		species_set = "human_extended"
+	elif args.species == "mouse":
+		species_set = "mouse_original"
+	else:
+		print("Error: did not recognise species: ", arg.species)
+		print("Please specify 'human' (default) or 'mouse'.")
+		sys.exit()
+
+	tag_files = {"aj" : species_set + "_TRAJ.tags",
+				 "av" : species_set + "_TRAV.tags",
+				 "bj" : species_set + "_TRBJ.tags",
+				 "bv" : species_set + "_TRBV.tags"}
 
 	tags = {}
 	for t in tag_files:
@@ -230,16 +251,16 @@ if __name__ == '__main__':
 		prefix = "nbc-" + prefix
 
 	if args.mixchains:
-		data = buildData(tags, args.readlen, int(args.numreads/2), args.orientation, args.version, args.nonbarcoding, args.bclength, args.inclerr, args.incltcr, args.matchtags)
+		data = buildData(tags, args.readlen, int(args.numreads/2), args.orientation, args.version, args.nonbarcoding, args.inclerr, args.incltcr, args.matchtags, args.oligo)
 		outfiles = map(lambda f: prefix + f, ["alpha-beta-data.fq"])
 		data = [data[0] + data[1]]
 
 	else:
-		data = buildData(tags, args.readlen, args.numreads, args.orientation, args.version, args.nonbarcoding, args.bclength, args.inclerr, args.incltcr, args.matchtags)
+		data = buildData(tags, args.readlen, args.numreads, args.orientation, args.version, args.nonbarcoding, args.inclerr, args.incltcr, args.matchtags, args.oligo)
 		outfiles = map(lambda f: prefix + f, ["alpha-data.fq", "beta-data.fq"])
 
-	print "Data saved to:"
+	print("Data saved to:")
 	for i in zip(outfiles, data):
 		dataWriter(i[0], i[1], args.dir)
-		print args.dir + os.sep + i[0]
+		print(args.dir + os.sep + i[0])
 
