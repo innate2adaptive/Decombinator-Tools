@@ -11,6 +11,7 @@ This repository contains scripts that may be helpful when working with the [Deco
 * [Run Test Data](#run-test-data)
 * [UMI Histogram](umi-histogram)
 * [Recipes](#recipes)
+    * [Job Scripts](#job-scripts)
 
 ---
 <h1 id="test-data-generator">Test Data Generator</h1>
@@ -242,3 +243,31 @@ source /path/to/Decombinator-Tools/recipes/Collapsinator.sh
 ```
 source Collapsinator.sh /path/to/Decombinator
 ```
+<h2 id="job-scripts">Job Scripts</h2>
+
+The Job Scripts directory contains an example job script for running the [Decombinator Test Data](https://github.com/innate2adaptive/Decombinator-Test-Data) compatible with the University College London cluster setup. Some modification may be required for other setups.
+
+* You will need to install Decombinator-Tools in your local space on the cluster. After logging in, run the command:
+    ```
+    git clone https://github.com/innate2adaptive/Decombinator-Tools.git
+    ```
+
+* To use the job script, you must first have Decombinator and its required packages installed within a conda virtual environment in your local space on the cluster. Instructions are provided on the main [Decombinator README](https://github.com/innate2adaptive/Decombinator#running-decombinator-on-a-cluster).
+
+* After Decombinator has been installed in your local space in the cluster, create an output directory for your data in your local Scratch space:
+    ```
+    mkdir Scratch/DCRExample
+    ```
+* Next you will need to modify step 6 labelled in job script `testdatajob.sh`, replacing `<user-id>` with your own user id. If you have named your output directory differently to `DCRExample`, this should also be changed in step 6. If you have named your conda environment differently to the example environment, this shop be changed in step 9 in the script.  
+
+* After making these changes, submit your job:
+   ```
+   qsub recipes/jobscripts/testdatajob.sh
+   ```
+* You can monitor your job using the `qstat` command. The initial state should show `qw` when waiting in the queue, and `r` when the job is running.
+* The output of running the test data will be saved to `Scratch/DCRExample/files_from_job_<job_number>.tar.gz`. Extract your data, replacing `<job_number>` with your cluster job number, using:
+   ````
+   tar -xvzf Scratch/DCRExample/files_from_job_<job_number>.tar.gz
+   ````
+
+This template script can be modified and extended to run the Decombinator pipeline on any appropriate data.  
