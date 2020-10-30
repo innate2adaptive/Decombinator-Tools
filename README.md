@@ -254,11 +254,11 @@ The Job Scripts directory contains an example job script for running the [Decomb
 
 * To use the job script, you must first have Decombinator and its required packages installed within a conda virtual environment in your local space on the cluster. Instructions are provided on the main [Decombinator README](https://github.com/innate2adaptive/Decombinator#running-decombinator-on-a-cluster).
 
-* After Decombinator has been installed in your local space in the cluster, create an output directory for your data in your local Scratch space:
+* After Decombinator has been installed in your local space on the cluster, create an output directory for your data in your local Scratch space:
     ```
     mkdir Scratch/DCRExample
     ```
-* Next you will need to modify step 6 labelled in job script `testdatajob.sh`, replacing `<user-id>` with your own user id. If you have named your output directory differently to `DCRExample`, this should also be changed in step 6. If you have named your conda environment differently to the example environment, this shop be changed in step 9 in the script.  
+* Next you will need to modify step 6 labelled in the job script `testdatajob.sh`, replacing `<user-id>` with your own user id. If you have named your output directory differently to `DCRExample`, this should also be changed in step 6. If you have named your conda environment differently to the example environment, this shop be changed in step 9 in the script.  
 
 * After making these changes, submit your job:
    ```
