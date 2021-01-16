@@ -75,7 +75,7 @@ def scanFastq(infile, subseqs, logs, suppressout = False):
 					if not suppressout:
 						for r in read:
 							openoutfiles[match].write(r+"\n")
-					logs[match] += 1
+					logs["counts"][match] += 1
 
 			if (lcount+1) % 1000000 == 0:
 				print("\t" + str(lcount+1) + " lines")
