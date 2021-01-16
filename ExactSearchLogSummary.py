@@ -20,8 +20,7 @@ if __name__ == '__main__':
 		for f in os.listdir(args.indir + os.sep + r):
 			
 			if not f.endswith(".log"):
-				continue
-			
+				continue			
 			lines = open(args.indir + os.sep + r + os.sep + f, "r").readlines()
 			in_file = os.path.basename(lines[0].rstrip().split(": ")[-1])
 			line_count = lines[1].rstrip().split(": ")[-1]
@@ -33,14 +32,14 @@ if __name__ == '__main__':
 				seq, count = l.rstrip().split(": ")
 				seq_counts[seq] = count
 
-			summary[f] = {}
-			summary[f]["file"] = in_file
-			summary[f]["line_count"] = line_count
-			summary[f]["read_count"] = read_count
-			summary[f]["av_read_len"] = av_read_len
-			summary[f]["counts"] = {}
+			summary[r] = {}
+			summary[r]["file"] = in_file
+			summary[r]["line_count"] = line_count
+			summary[r]["read_count"] = read_count
+			summary[r]["av_read_len"] = av_read_len
+			summary[r]["counts"] = {}
 			for s in seq_counts:
-				summary[f]["counts"][s] = seq_counts[s]
+				summary[r]["counts"][s] = seq_counts[s]
 				if not s in seqs:
 					seqs.append(s)
 
