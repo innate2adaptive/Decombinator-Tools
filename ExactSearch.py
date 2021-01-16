@@ -62,7 +62,7 @@ def scanFastq(infile, subseqs, logs, suppressout = False):
 	opener = openerType(infile)
 	start_time = time()
 	print("Scanning...")
-	with opener(infile, "r") as ofile:
+	with opener(infile, "rt") as ofile:
 		for lcount, line in enumerate(ofile):
 			if lcount % 4 == 0:
 				read = [line.rstrip()]
