@@ -44,7 +44,7 @@ def createOutfiles(infile, subseqs, outdir="ExactSearchResults"):
 	# 	outdir = outdir + str(k)
 	# os.mkdir(outdir)
 
-	matchdir = outdir + os.sep + infile.split(".")[0] + "_matches"
+	matchdir = outdir + os.sep + os.path.basename(infile).split(".")[0] + "_matches"
 	os.mkdir(matchdir)
 	for s in subseqs:
 		f = matchdir + os.sep + s + ".fastq"
