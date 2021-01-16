@@ -58,6 +58,7 @@ def scanFastq(infile, subseqs, logs, suppressout = False):
 		outfiles = createOutfiles(infile, subseqs)
 		openoutfiles = {os.path.basename(ofile).split(".")[0] : open(ofile, "w") for ofile in outfiles}
 
+	totalreadseqlen = 0
 	opener = openerType(infile)
 	start_time = time()
 	print("Scanning...")
@@ -65,22 +66,28 @@ def scanFastq(infile, subseqs, logs, suppressout = False):
 		for lcount, line in enumerate(ofile):
 			if lcount % 4 == 0:
 				read = [line.rstrip()]
-			read.append(line.rstrip())
-			match = exactSearch(read, subseqs)
-			if match:
-				if not suppressout:
-					for r in read:
-						openoutfiles[match].write(r+"\n")
-				logs[match] += 1
-			if lcount+1 % 1000000 == 0:
-				print("\t" + str(lcount) + " lines")
+			else:
+				read.append(line.rstrip())
+			if len(read) == 4:
+				match = exactSearch(read, subseqs)
+				totalreadseqlen += len(read[1])
+				if match:
+					if not suppressout:
+						for r in read:
+							openoutfiles[match].write(r+"\n")
+					logs[match] += 1
+
+			if (lcount+1) % 1000000 == 0:
+				print("\t" + str(lcount+1) + " lines")
+				print(read)
 
 	scan_time = round(time() - start_time, 2)
 	print("total of " + str(lcount+1) + " lines scanned")
 	print("scan time: " + str(scan_time) + " seconds")
 	logs["num_input_lines"] = lcount+1
-	logs["num_input_reads"] = (lcount+1)/4
+	logs["num_input_reads"] = int((lcount+1)/4)
 	logs["scan_time"] = scan_time
+	logs["av_read_len"] = totalreadseqlen/((lcount+1)/4)
 	for o in openoutfiles.values():
 		o.close()
 
@@ -98,6 +105,7 @@ def initLogs(args):
 	logs["counts"] = {s: 0 for s in subseqs}
 	logs["num_input_lines"] = 0
 	logs["num_input_reads"] = 0
+	logs["av_read_len"] = 0
 	logs["scan_time"] = 0
 	return logs
 
@@ -107,6 +115,7 @@ def writeLogs(logs, outdir):
 		ofile.write("infile: " + logs["infile"] + "\n")
 		ofile.write("no. of input lines: " + str(logs["num_input_lines"]) + "\n")
 		ofile.write("no. of input reads: " + str(logs["num_input_reads"])+ "\n")
+		ofile.write("average read seq length: " + str(logs["av_read_len"])+ "\n")
 		ofile.write("scan time: " + str(logs["scan_time"])+ "\n")
 		ofile.write("subseqfile: " + logs["subseqfile"] + "\n")
 		ofile.write("include revcomp: " + str(logs["revcomp"]) +"\n")
@@ -117,7 +126,7 @@ def writeLogs(logs, outdir):
 
 def exactSearch(read, subseqs):
 	for s in subseqs:
-		if s in read:
+		if s in read[1]:
 			return s
 	return None
 
