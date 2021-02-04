@@ -46,9 +46,13 @@ if __name__ == '__main__':
 
 	header = ", ".join(["file", "line count", "read count", "average read length"] + seqs)
 
+	files = list(summary.keys())
+	files.sort()
+
 	with open(outfile, "w") as ofile:
 		ofile.write(header + "\n")
-		for f in summary:
+
+		for f in files:
 			row = [summary[f]["file"], summary[f]["line_count"], summary[f]["read_count"],
 					 summary[f]["av_read_len"]]
 			for seq in seqs:
