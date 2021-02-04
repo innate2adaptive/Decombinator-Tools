@@ -11,6 +11,8 @@ def args():
 	parser = argparse.ArgumentParser(description='Generate qsub scripts for Decombinator pipeline')
 	parser.add_argument('-in', '--infile', type=str, required=True, help='Input fastq or fastq.gz file to scan')
 	parser.add_argument('-sf', '--subseqfile', type=str, required=True, help='File listing subsequences to search for in fastq reads')
+	parser.add_argument('-r', '--rev', action='store_true', required=False, help='Set to also search fastq with reverse of subsequences')
+	parser.add_argument('-c', '--comp', action='store_true', required=False, help='Set to also search fastq with complements of subsequences')	
 	parser.add_argument('-rc', '--revcomp', action='store_true', required=False, help='Set to also search fastq with reverse complements of subsequences')
 	parser.add_argument('-s', '--suppressout', action='store_true', required=False, help='Set to suppress output files and only write log file')
 	return parser.parse_args()
@@ -21,15 +23,28 @@ def openerType(infile):
 	else:
 		return open
 
+
+def rev(s):
+	return s[::-1]
+
+def comp(s):
+	return str(Seq(s).complement())
+
 def revcomp(s):
 	return str(Seq(s).reverse_complement())
 
-def getSubseqs(subseqfile, rc = False):
+def getSubseqs(subseqfile, reverse = False, complement = False, revcomplement = False):
 	seqs = open(subseqfile, "r").readlines()
-	seqs = [s.rstrip() for s in seqs]
-	if rc:
-		rc_seqs = [revcomp(s) for s in seqs]
-		seqs += rc_seqs
+	seqs = {s.rstrip() : (i,"original") for i, s in enumerate(seqs)} # i to give id to original seqs
+	extra_seqs = {}
+	for s in seqs:
+		if reverse:
+			extra_seqs[rev(s)] = (seqs[s][0], "reverse") # preserve id of original seq
+		if complement:
+			extra_seqs[comp(s)] = (seqs[s][0], "complement")
+		if revcomplement:
+			extra_seqs[revcomp(s)] = (seqs[s][0], "revcomp")
+	seqs.update(extra_seqs)
 	return seqs
 
 def createOutfiles(infile, subseqs, outdir="ExactSearchResults"):
@@ -79,7 +94,6 @@ def scanFastq(infile, subseqs, logs, suppressout = False):
 
 			if (lcount+1) % 1000000 == 0:
 				print("\t" + str(lcount+1) + " lines")
-				print(read)
 
 	scan_time = round(time() - start_time, 2)
 	print("total of " + str(lcount+1) + " lines scanned")
@@ -95,13 +109,31 @@ def scanFastq(infile, subseqs, logs, suppressout = False):
 	writeLogs(logs, outdir)
 	return 1
 
+def listSubseqs(subseqs):
+	list_format = []
+	for s in subseqs:
+		list_format.append((subseqs[s][0], subseqs[s][1], s))
+	list_format.sort(key = lambda x: x[0])
+	return list_format
+
+def strSubseqs(list_subseqs):
+	str_format = ""
+	for s in list_subseqs:
+		seq_string = " : ".join([str(s[0]), s[1], s[2]])
+		str_format += "\n\t" + seq_string
+	return str_format
+
 def initLogs(args):
 	logs = {}
 	logs["infile"] = os.path.abspath(args.infile)
 	logs["subseqfile"] =os.path.abspath(args.subseqfile)
+	logs["rev"] = args.rev
+	logs["comp"] = args.comp
 	logs["revcomp"] = args.revcomp
-	subseqs = getSubseqs(args.subseqfile, args.revcomp)
-	logs["subseqs"] =  ", ".join(subseqs)
+	subseqs = getSubseqs(args.subseqfile, args.rev, args.comp, args.revcomp)
+	list_subseqs = listSubseqs(subseqs)
+	logs["list_subseqs"] =  list_subseqs
+	logs["str_subseqs"] =  strSubseqs(list_subseqs)
 	logs["counts"] = {s: 0 for s in subseqs}
 	logs["num_input_lines"] = 0
 	logs["num_input_reads"] = 0
@@ -118,10 +150,17 @@ def writeLogs(logs, outdir):
 		ofile.write("average read seq length: " + str(logs["av_read_len"])+ "\n")
 		ofile.write("scan time: " + str(logs["scan_time"])+ "\n")
 		ofile.write("subseqfile: " + logs["subseqfile"] + "\n")
+		ofile.write("include rev: " + str(logs["rev"]) +"\n")
+		ofile.write("include comp: " + str(logs["comp"]) +"\n")
 		ofile.write("include revcomp: " + str(logs["revcomp"]) +"\n")
-		ofile.write("subseqs: " + logs["subseqs"] + "\n")
-		for c in logs["counts"]:
-			ofile.write(c + ": " + str(logs["counts"][c]) + "\n")
+		ofile.write("subseqs: " + logs["str_subseqs"] +"\n")
+		ofile.write("counts:" +"\n")
+		for s in logs["list_subseqs"]:
+		#	from IPython import embed
+			c = ", ".join([ str(s[0]), s[1], s[2], str(logs["counts"][s[2]]) ])
+			ofile.write("\t" + c + "\n")
+		# for c in logs["counts"]:
+		# 	ofile.write(c + ": " + str(logs["counts"][c]) + "\n")
 	return 1
 
 def exactSearch(read, subseqs):
@@ -133,11 +172,11 @@ def exactSearch(read, subseqs):
 if __name__ == '__main__':
 	args = args()
 	logs = initLogs(args)
-	subseqs = getSubseqs(args.subseqfile, args.revcomp)
+	subseqs = getSubseqs(args.subseqfile, args.rev, args.comp, args.revcomp)
 	print("Subsequences:")
 	for s in subseqs:
-		print("\t"+s)
-	scanFastq(args.infile, subseqs, logs)
+		print("\t"+ " : ".join([s, str(subseqs[s][0]), subseqs[s][1]]))
+	scanFastq(args.infile, list(subseqs.keys()), logs)
 
 
 

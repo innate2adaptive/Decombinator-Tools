@@ -27,10 +27,11 @@ if __name__ == '__main__':
 			read_count = lines[2].rstrip().split(": ")[-1]
 			av_read_len = lines[3].rstrip().split(": ")[-1]
 
+			seq_counts_start = lines.index("counts:\n") + 1
 			seq_counts = {}
-			for l in lines[8:]:
-				seq, count = l.rstrip().split(": ")
-				seq_counts[seq] = count
+			for l in lines[seq_counts_start:]:
+				seq_id, seq_direction, seq, count = l.strip().split(", ")
+				seq_counts[":".join([str(seq_id),seq_direction,seq])] = count
 
 			summary[r] = {}
 			summary[r]["file"] = in_file
