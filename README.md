@@ -9,10 +9,10 @@ This repository contains scripts that may be helpful when working with the [Deco
 * [DCR to Gene Name](#dcr-to-gene)
 * [Randomly Sample](#randomly-sample)
 * [Run Test Data](#run-test-data)
-* [UMI Histogram](umi-histogram)
+* [UMI Histogram](#umi-histogram)
 * [Recipes](#recipes)
     * [Job Scripts](#job-scripts)
-* [Collapsed Sample Overlap](sample-overlap)
+* [Collapsed Sample Overlap](#sample-overlap)
 
 ---
 <h1 id="test-data-generator">Test Data Generator</h1>
