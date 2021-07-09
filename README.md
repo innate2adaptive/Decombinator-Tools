@@ -285,11 +285,13 @@ This script calculates the TCR overlap (using the 5-part Decombinator id, DCR) b
 * The overlap is calculated as follows:
 Let A be the overlap matrix. Then for any two samples *i,j*, 
 
-A<sub>{i,j}</sub>, the overlap with respect to row i, is
+*A<sub>{i,j}</sub>*, the overlap with respect to row *i*, is
 
-(Number of distinct DCRs found in both i and j) / (number of unique DCRs in i).
+   ```
+   (Number of distinct DCRs found in both *i* and *j*) / (number of unique DCRs in *i*).
+   ```
 
-* Note this is in general asymmetric (A_{i,j} is not equal to A_{j,i}).
+* Note this is in general asymmetric (*A<sub>{i,j}</sub>* is not equal to *A<sub>{j,i}</sub>*).
 
 * The overlap matrix is then plotted as a heatmap, with red squares marking an overlap greater than (mean + 3 standard deviations). This threshold can be adjusted in the script.
 
