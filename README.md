@@ -271,3 +271,26 @@ The Job Scripts directory contains an example job script for running the [Decomb
    ````
 
 This template script can be modified and extended to run the Decombinator pipeline on any appropriate data.  
+
+---
+<h1 id="sample-overlap">Collapsed Sample Overlap</h1>
+
+This script should be run using **R**.
+
+The folder also contains examples of the plots produced by the script.
+
+This script calculates the TCR overlap (using the 5-part Decombinator id, DCR) between any two samples produced using Collapsinator from Decombinator V4. 
+
+* The overlap is calculated as follows:
+Let A be the overlap matrix. Then for any two samples i,j, 
+A_{i,j}, the overlap with respect to row i, is
+(Number of distinct DCRs found in both i and j) / (number of unique DCRs in i).
+
+* Note this is in general asymmetric (A_{i,j} is not equal to A_{j,i}).
+
+* The overlap matrix is then plotted as a heatmap, with red squares marking an overlap greater than (mean + 3 standard deviations). This threshold can be adjusted in the script.
+
+* If comparing all samples in a particular sequencing run, note that as some runs contain several samples from the same individual/s, 
+ the absolute expected 'background' overlap will differ between runs.
+
+* The script calculates and plots the overlap of the alpha files first followed by beta.
