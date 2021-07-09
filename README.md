@@ -12,6 +12,7 @@ This repository contains scripts that may be helpful when working with the [Deco
 * [UMI Histogram](umi-histogram)
 * [Recipes](#recipes)
     * [Job Scripts](#job-scripts)
+* [Collapsed Sample Overlap](sample-overlap)
 
 ---
 <h1 id="test-data-generator">Test Data Generator</h1>
@@ -282,8 +283,10 @@ The folder also contains examples of the plots produced by the script.
 This script calculates the TCR overlap (using the 5-part Decombinator id, DCR) between any two samples produced using Collapsinator from Decombinator V4. 
 
 * The overlap is calculated as follows:
-Let A be the overlap matrix. Then for any two samples i,j, 
-A_{i,j}, the overlap with respect to row i, is
+Let A be the overlap matrix. Then for any two samples *i,j*, 
+
+A<sub>{i,j}</sub>, the overlap with respect to row i, is
+
 (Number of distinct DCRs found in both i and j) / (number of unique DCRs in i).
 
 * Note this is in general asymmetric (A_{i,j} is not equal to A_{j,i}).
