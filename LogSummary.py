@@ -37,11 +37,21 @@
 from os import listdir, sep
 from os.path import isfile, join
 import sys
-import fileinput
+import argparse
+
+def args():
+  parser = argparse.ArgumentParser(description='Sort Decombinator pipeline summary according to input list of samples')
+  parser.add_argument('-l', '--logpath', type=str, help='Full path to Logs folder', required=True)
+  parser.add_argument('-o', '--outfile', type=str, help='Output log summary file', required=True)
+  parser.add_argument('-s', '--sortfile', type=str, help='File listing order of samples for summary file', required=False) 
+  return parser.parse_args()
 
 ##### Start #####
+args = args()
 
-pathToLogs = str(sys.argv[1]) # full path to Logs folder
+pathToLogs = args.logpath # full path to Logs folder
+outfile = args.outfile # output log summary file
+summaryOrderFile = args.sortfile # optional file containing sample row order for summary file
 
 # add slash to end of path if it is not supplied by user
 if pathToLogs[-1] != "/":
@@ -79,7 +89,7 @@ fields = ["sample",
           "AverageOutputTCRAbundance",
           "AverageRNAduplication"]
 
-out = []
+out = {}
 
 for i in sampleNam:
 
@@ -170,9 +180,55 @@ for i in sampleNam:
             string[0] = new_nam
     
     outStr = ','.join(string)
-    out.append(outStr)
+    out[string[0]] = outStr
 
-with open(str(sys.argv[2]), 'w') as f:
+# get order from file (if supplied)
+if summaryOrderFile:
+  samples = []
+  with open(summaryOrderFile, 'r') as samplefile:
+    for line in samplefile:
+      sample = line.rstrip().split(',')[0]
+      # get correct names if unusual characters in name
+      for char in ['.', '-']:
+        if char in sample:
+          sample = sample.replace(char, '_')
+      samples.append(sample)
+
+  sorted_output_lines = []
+  # first sort by chain
+  prefix = "dcr"
+  suffix = "n12_gz"
+  for chain in ['alpha', 'beta']:
+    for s in samples:
+      full_sample_name = "_".join([prefix, s, chain, suffix]) 
+
+      if full_sample_name not in out:
+       print("Warning: could not find", full_sample_name, "in Logs")
+       continue  
+
+      sorted_output_lines.append(out[full_sample_name])
+
+# if no file provided, sort by chain and alphabetically
+else:
+  alpha_lines = []
+  beta_lines = []
+  other_lines = []
+  # split into alpha and beta (or other)
+  for sample, line in out.items():
+    if 'alpha' in sample:
+      alpha_lines.append(line)
+    elif 'beta' in sample:
+      beta_lines.append(line)
+    else:
+      other_lines.append(line)
+  # sort alphabetically
+  alpha_lines.sort()
+  beta_lines.sort()
+  other_lines.sort()
+  # merge for full list
+  sorted_output_lines = alpha_lines + beta_lines + other_lines
+
+with open(outfile, 'w') as f:
     f.write(','.join(fields)+"\n")
-    for string in out:
+    for string in sorted_output_lines:
         f.write("%s\n" % string)
