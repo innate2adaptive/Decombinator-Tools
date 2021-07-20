@@ -70,10 +70,18 @@ This script will generate a summary csv file of all the data stored in the `Logs
 
 How to run:
 ```
-python LogSummary.py /path/to/LogsFolder/ /path/to/outfile.csv
+python LogSummary.py -l /path/to/LogsFolder/ -o /path/to/outfile.csv
 ```
 The output csv file contains the following fields:
 `sample` `NumberReadsInput` `NumberReadsDecombined` `PercentReadsDecombined` `UniqueDCRsPassingFilters` `TotalDCRsPassingFilters` `PercentDCRPassingFilters(withbarcode)` `UniqueDCRsPostCollapsing` `TotalDCRsPostCollapsing` `PercentUniqueDCRsKept` `PercentTotalDCRsKept` `AverageInputTCRAbundance` `AverageOutputTCRAbundance` `AverageRNAduplication`
+
+The order of the output summary will contain samples containing 'alpha' in their name, followed by those containing 'beta', followed by any additional samples that contain neither, all sorted alphabetically.
+
+Alternatively, an additional argument can be used to specify the order of samples in the output summary file:
+```
+python LogSummary.py -l /path/to/LogsFolder/ -o /path/to/outfile.csv -s /path/to/order/of/samples.csv
+```
+The first column of this file should contain the sample names in the desired order, and the file should be comma-separated if it contains more than one column. This is designed to match the formatting of the index sample sheet used with Demultiplexor (which can simply be re-used here for the summary ordering).
 
 ---
 <h1 id="dcr-to-gene">DCR to Gene Name</h1>
