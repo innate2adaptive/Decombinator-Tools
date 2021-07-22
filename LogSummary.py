@@ -1,10 +1,13 @@
 # Written by Mazlina Ismail : July 2017
-# Last updated by Thomas Peacock: August 2020 
+# Updated by Thomas Peacock: August 2020
+# Updated by Thomas Peacock: July 2021 
 
 #### Update Notes ####
   
   # update for Python 3
   # updated to run from Decombinator-Tools repository
+  # updated to sort output alphabetically or according to input sample sheet
+
 
 ##### Pseudocode #####
 
@@ -24,7 +27,11 @@
 
 ##### How to run #####
 
-  # python LogSummary.py full/path/to/Logs/folder/ outfile.csv
+  # python LogSummary.py -l full/path/to/Logs/folder/ - o outfile.csv
+
+  # or optionally include sample sheet for ordering of outfile csv:
+  #     python LogSummary.py -l full/path/to/Logs/folder/ - o outfile.csv -s samplesheet.csv
+
 
 # NB 
   # assumes that all Log files are in one Log folder
@@ -182,8 +189,8 @@ for i in sampleNam:
     outStr = ','.join(string)
     out[string[0]] = outStr
 
-# get order from file (if supplied)
 if summaryOrderFile:
+  # get order from file (if supplied)
   samples = []
   with open(summaryOrderFile, 'r') as samplefile:
     for line in samplefile:
@@ -194,22 +201,36 @@ if summaryOrderFile:
           sample = sample.replace(char, '_')
       samples.append(sample)
 
-  sorted_output_lines = []
-  # first sort by chain
-  prefix = "dcr"
-  suffix = "n12_gz"
-  for chain in ['alpha', 'beta']:
+    alpha_lines = []
+    beta_lines = []
+    other_lines = []
+
     for s in samples:
-      full_sample_name = "_".join([prefix, s, chain, suffix]) 
+        found_sample = False
+        for summary in out:
+            line = out[summary]
+            if s in summary and 'alpha' in summary:
+                if line not in sorted_alpha_lines:
+                    alpha_lines.append(line)
+                    found_sample = True
 
-      if full_sample_name not in out:
-       print("Warning: could not find", full_sample_name, "in Logs")
-       continue  
+            elif s in summary and 'beta' in summary:
+                if line not in sorted_beta_lines:
+                    beta_lines.append(line)
+                    found_sample = True
 
-      sorted_output_lines.append(out[full_sample_name])
+            elif s in summary:
+                if line not in sorted_other_lines:
+                    other_lines.append(line)
+                    found_sample = True     
 
-# if no file provided, sort by chain and alphabetically
+        if not found_sample:
+            print("Warning: could not find sample containing", "'"+s+"'", "in Logs")
+
+    sorted_output_lines = alpha_lines + beta_lines + other_lines
+
 else:
+  # if no file provided, sort by chain and alphabetically
   alpha_lines = []
   beta_lines = []
   other_lines = []

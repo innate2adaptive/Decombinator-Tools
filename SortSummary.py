@@ -9,9 +9,6 @@ def args():
 
 args = args()
 
-prefix = "dcr"
-suffix = "n12_gz"
-
 header = None
 summary_data = {}
 with open(args.summaryfile, 'r') as sumfile:
@@ -32,16 +29,39 @@ with open(args.infile, 'r') as samplefile:
 				sample = sample.replace(char, '_')
 		samples.append(sample)
 
-sorted_output_lines = []
-for chain in ['alpha', 'beta']:
-	for s in samples:
-		full_sample_name = "_".join([prefix, s, chain, suffix])
+sorted_alpha_lines = []
+sorted_beta_lines = []
+sorted_other_lines = []
 
-		if full_sample_name not in summary_data:
-			print("Warning: could not find", full_sample_name, "in", args.summaryfile)
-			continue
+for s in samples:
+	found_sample = False
+	for summary in summary_data:
+		line = summary_data[summary]
+		if s in summary and 'alpha' in summary:
+			if line not in sorted_alpha_lines:
+				sorted_alpha_lines.append(line)
+				found_sample = True
 
-		sorted_output_lines.append(summary_data[full_sample_name])
+		elif s in summary and 'beta' in summary:
+			if line not in sorted_beta_lines:
+				sorted_beta_lines.append(line)
+				found_sample = True
+
+		elif s in summary:
+			if line not in sorted_other_lines:
+				sorted_other_lines.append(line)
+				found_sample = True		
+
+	if not found_sample:
+		print("Warning: could not find sample containing", "'"+s+"'", "in", args.summaryfile)
+
+sorted_output_lines = sorted_alpha_lines + sorted_beta_lines + sorted_other_lines
+
+# check if all lines in summary are still in sorted summary
+for summary in summary_data:
+	line = summary_data[summary]
+	if not line in sorted_output_lines:
+		print("Warning:", summary, "in", args.summaryfile, "but no equivalent found in", args.infile)
 
 new_summary_file = os.path.splitext(args.summaryfile)[0] + '.sorted.csv'
 
