@@ -206,26 +206,29 @@ if summaryOrderFile:
     other_lines = []
 
     for s in samples:
-        found_sample = False
-        for summary in out:
-            line = out[summary]
-            if s in summary and 'alpha' in summary:
-                if line not in sorted_alpha_lines:
-                    alpha_lines.append(line)
-                    found_sample = True
+      found_sample = False
+      for summary in out:
+        line = out[summary]
 
-            elif s in summary and 'beta' in summary:
-                if line not in sorted_beta_lines:
-                    beta_lines.append(line)
-                    found_sample = True
+        if s in summary:
 
-            elif s in summary:
-                if line not in sorted_other_lines:
-                    other_lines.append(line)
-                    found_sample = True     
+          if 'alpha' in summary:
+            if line not in alpha_lines:
+              alpha_lines.append(line)
+              found_sample = True
+                
+          if 'beta' in summary:
+            if line not in beta_lines:
+              beta_lines.append(line)
+              found_sample = True
 
-        if not found_sample:
-            print("Warning: could not find sample containing", "'"+s+"'", "in Logs")
+          if not 'alpha' in summary and not 'beta' in summary:
+            if line not in other_lines:
+              other_lines.append(line)
+              found_sample = True    
+
+    if not found_sample:
+        print("Warning: could not find sample containing", "'"+s+"'", "in Logs")
 
     sorted_output_lines = alpha_lines + beta_lines + other_lines
 
