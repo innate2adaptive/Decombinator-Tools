@@ -131,7 +131,7 @@ for i in sampleNam:
                 for idx, l in enumerate(lines):
                     
                     if 'InputFile' in l:
-                        nam = l.split('/')[-1] # modify here for either
+                        nam = l.split(',')[-1] # modify here for either
                                               # comma or slash
                         if nam == i:
                             for item in lines[idx:]:
