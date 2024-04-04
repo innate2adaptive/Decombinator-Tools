@@ -1,8 +1,9 @@
 # RandomlySample.py 
 # March 2016, Jamie Heather, UCL
 # Updated August 2020, Thomas Peacock, UCL
+# Updated March 2024, Matthew Cowley, UCL
 
-# Take a given file produced from the Decombinator pipeline (.fq, .n12, .freq, .cdr3, .np, .dcrcdr3) and randomly sub-sample to a given number
+# Take a given file produced from the Decombinator pipeline (.fq, .n12, .freq, .cdr3) and randomly sub-sample to a given number
 
 import time
 import argparse
@@ -34,7 +35,7 @@ def args():
     
     return parser.parse_args()
 
-def symbol_positions(line, symbol):
+def find_symbol_positions(line, symbol):
     """ Return the location of all the commas in an input string or line """
     return [m.start() for m in re.finditer(symbol, line)] 
 
@@ -44,7 +45,8 @@ def get_file_type(infile, opener):
       test_lines = [next(fl) for x in range(4)]    
 
     file_type = ""
-    comma = symbol_positions(test_lines[0], ',')
+    comma = find_symbol_positions(test_lines[0], ',')
+    tab = find_symbol_positions(test_lines[0], "\t")
     
     if test_lines[0][0] == "@" and test_lines[2][0] == "+" and len(test_lines[1]) == len(test_lines[3]):
       file_type = 'fq'
@@ -56,18 +58,15 @@ def get_file_type(infile, opener):
         file_type = 'dcrcdr3'
         
     else:
-      if len(comma) == 1:
+      if len(comma) == 0 and len(tab) > 0:
         file_type = 'cdr3'
-      elif len(comma) == 5:
+      elif len(comma) == 6:
         file_type = 'freq'  
       elif len(comma) == 9 or len(comma) == 0:
         file_type = 'n12'  
       elif len(comma) == 4:
-        file_type = 'dcr'  
-      #elif len(comma) == :
-        #file_type = ''  
-      #else:
-      
+        file_type = 'dcr'
+
     if file_type:
       return file_type
     else:
@@ -156,13 +155,20 @@ if __name__ == '__main__':
     else:
       file_type = get_file_type(inputargs['infile'], in_opener)
     
-    if file_type not in ['fq', 'n12', 'line', 'cdr3', 'dcrcdr3', 'freq', 'dcr', 'np']:
+    if file_type in ['dcrdcr3', 'np', 'line']:
+       print(f"Support for .{file_type} has been depreciated. Please use an earlier version of this script if support is required.")
+       sys.exit()
+
+    if file_type not in ['fq', 'n12', 'cdr3', 'freq', 'dcr']:
       print("File type not recognised. Please include in file name or set -ft flag appropriately.")
       sys.exit() 
-    if file_type in ['n12', 'line', 'dcr', 'fq']: # File types that are in no way collapsed
+
+    if file_type in ['n12', 'dcr', 'fq']: # File types that are in no way collapsed
       with_frequency = False
+      print(f"Reading .{file_type} without frequency information.")
     else:
       with_frequency = True
+      print(f"Reading .{file_type} with frequency information.")
       
     whole_list = []
         
@@ -179,7 +185,17 @@ if __name__ == '__main__':
           counts['in_count'] += 1
         
       else:
+        if file_type == "freq":
+           freq_index = -2
+           symbol = ","
+        elif file_type == "cdr3":
+           freq_index = 4
+           symbol = "\t"
+
         for line in infile:
+          if file_type == "cdr3" and counts['in_lines'] == 0:
+             counts['in_lines'] += 1
+             continue
           counts['in_lines'] += 1
           
           if with_frequency == False:
@@ -187,9 +203,13 @@ if __name__ == '__main__':
             whole_list.append(line.rstrip())
           
           else:
-            comma = symbol_positions(line, ',')
-            identifier = line[:comma[-1]]
-            freq = int(re.sub('[, ]', '', line[comma[-1]:]))
+            symbol_positions = find_symbol_positions(line, symbol)
+            if file_type == "freq":
+              identifier = line[:symbol_positions[freq_index]]
+              freq = int(re.sub('[, ]', '', line[symbol_positions[freq_index]:symbol_positions[freq_index + 1]]))
+            elif file_type == "cdr3":
+              identifier = line[:symbol_positions[freq_index]] + line[symbol_positions[freq_index + 1]:]
+              freq = int(re.sub('[\t ]', '', line[symbol_positions[freq_index]:symbol_positions[freq_index + 1]]))
             counts['in_count'] += freq
             
             for i in range(freq):
@@ -210,8 +230,12 @@ if __name__ == '__main__':
           collapsed[s] += 1
         
         for c in collapsed.most_common():
-          outline = c[0] + ", " + str(c[1]) + "\n"
-          outfile.write(outline)
+          if file_type == "cdr3":
+            outline = c[0][:-1] + "\t " + str(c[1]) + "\n"
+            outfile.write(outline)
+          else:
+            outline = c[0] + ", " + str(c[1]) + "\n"
+            outfile.write(outline)
         
         counts['number_unique_outlines'] = len(collapsed)
       
