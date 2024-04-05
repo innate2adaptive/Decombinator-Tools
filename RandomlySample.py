@@ -235,11 +235,10 @@ if __name__ == '__main__':
             if counts["header_added"] == 0:
                outfile.write(cdr3_header)
                counts["header_added"] += 1
-            else:
-              list_c = c[0].split("\t")
-              list_c[5] = " " + str(c[1])
-              outline = "\t".join(list_c)
-              outfile.write(outline)
+            list_c = c[0].split("\t")
+            list_c[5] = " " + str(c[1])
+            outline = "\t".join(list_c)
+            outfile.write(outline)
           else:
             list_c = c[0].split(",")
             list_c[-2] = " " + str(c[1])
