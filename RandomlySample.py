@@ -194,6 +194,7 @@ if __name__ == '__main__':
 
         for line in infile:
           if file_type == "cdr3" and counts['in_lines'] == 0:
+             cdr3_header = line
              counts['in_lines'] += 1
              continue
           counts['in_lines'] += 1
@@ -205,10 +206,10 @@ if __name__ == '__main__':
           else:
             symbol_positions = find_symbol_positions(line, symbol)
             if file_type == "freq":
-              identifier = line[:symbol_positions[freq_index]]
+              identifier = line
               freq = int(re.sub('[, ]', '', line[symbol_positions[freq_index]:symbol_positions[freq_index + 1]]))
             elif file_type == "cdr3":
-              identifier = line[:symbol_positions[freq_index]] + line[symbol_positions[freq_index + 1]:]
+              identifier = line
               freq = int(re.sub('[\t ]', '', line[symbol_positions[freq_index]:symbol_positions[freq_index + 1]]))
             counts['in_count'] += freq
             
@@ -231,10 +232,18 @@ if __name__ == '__main__':
         
         for c in collapsed.most_common():
           if file_type == "cdr3":
-            outline = c[0][:-1] + "\t " + str(c[1]) + "\n"
-            outfile.write(outline)
+            if counts["header_added"] == 0:
+               outfile.write(cdr3_header)
+               counts["header_added"] += 1
+            else:
+              list_c = c[0].split("\t")
+              list_c[5] = " " + str(c[1])
+              outline = "\t".join(list_c)
+              outfile.write(outline)
           else:
-            outline = c[0] + ", " + str(c[1]) + "\n"
+            list_c = c[0].split(",")
+            list_c[-2] = " " + str(c[1])
+            outline = ",".join([str(i) for i in list_c])
             outfile.write(outline)
         
         counts['number_unique_outlines'] = len(collapsed)
