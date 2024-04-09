@@ -37,7 +37,7 @@ find temp/ -type f -name "*.csv*" -exec mv {} processed/$POOLID/logs/ \;
 
 # Generate summary sheet
 source /share/apps/source_files/python/python-3.10.0.source
-python3 $TOOLS/LogSummary.py -l processed/$POOLID/logs/ -o processed/$POOLID/Summary_$POOLID.csv -s $POOLID.csv
+python3 $TOOLS/analysis/LogSummary.py -l processed/$POOLID/logs/ -o processed/$POOLID/Summary_$POOLID.csv -s $POOLID.csv
 
 echo "Repacking and summary complete. Please scp the files to the desired location."
 echo "Take care not to overwrite any previous data that shares the name $POOLID!"

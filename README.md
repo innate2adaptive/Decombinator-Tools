@@ -10,7 +10,7 @@ This repository contains scripts that may be helpful when working with the [Deco
 * [Randomly Sample](#randomly-sample)
 * [Run Test Data](#run-test-data)
 * [UMI Histogram](#umi-histogram)
-* [Recipes](#recipes)
+* [run_scripts](#run_scripts)
     * [Job Scripts](#job-scripts)
 * [Collapsed Sample Overlap](#sample-overlap)
 
@@ -29,7 +29,7 @@ The id of each read in the FASTQ file contains information regarding which chain
 
 ## Customisability
 
-The test data generator can be provided a number of input arguments to customise the output test data. Information on these arguments can be found be running:
+The test data generator can be provided a number of input arguments to customise the output test data. Information on these arguments can be found by running:
 ```
 python TestDataGenerator.py -h
 ```
@@ -67,13 +67,13 @@ python TestDataGenerator.py -v s -or forward -ie 40
 ---
 <h1 id="test-data-generator">Log Summary</h1>
 
-This script will generate a summary csv file of all the data stored in the `Logs` folder within the Decombinator repository. This script is should be run in **Python 3**.
+This script will generate a summary `.csv` file of all the data stored in the `Logs` folder within the Decombinator repository. This script is should be run in **Python 3**.
 
 How to run:
 ```
 python LogSummary.py -l /path/to/LogsFolder/ -o /path/to/outfile.csv
 ```
-The output csv file contains the following fields:
+The output `.csv` file contains the following fields:
 `sample` `NumberReadsInput` `NumberReadsDecombined` `PercentReadsDecombined` `UniqueDCRsPassingFilters` `TotalDCRsPassingFilters` `PercentDCRPassingFilters(withbarcode)` `UniqueDCRsPostCollapsing` `TotalDCRsPostCollapsing` `PercentUniqueDCRsKept` `PercentTotalDCRsKept` `AverageInputTCRAbundance` `AverageOutputTCRAbundance` `AverageRNAduplication`
 
 The order of the output summary will contain samples containing 'alpha' in their name, followed by those containing 'beta', followed by any additional samples that contain neither, all sorted alphabetically.
@@ -98,7 +98,7 @@ How to run:
 python DCRtoGeneName.py -in path/to/input_alpha_file.n12.gz 
 ```
 
-If chain name is not present in the input file name, it should be supplied by the user, e.g. : 
+If the chain name is not present in the input file name, it should be supplied by the user, e.g. : 
 ```
 python DCRtoGeneName.py -in path/to/input_file.freq -c beta 
 ```
@@ -119,9 +119,9 @@ How to run:
 ```
 python RandomlySample.py -in /path/to/infile.n12 -n 50
 ```
-where the `-in` argument should be supplied with the file to be subsampled, and the `-n` argument should be supplied with the desired final sample size. The output file filename of the input file prefixed by `subsampled_`. Note that the path will not be retained, and the output file will be written to the current working directory. Similarly, the Logs file will be stored in the current working directory.
+where the `-in` argument should be supplied with the file to be subsampled, and the `-n` argument should be supplied with the desired final sample size. The output file filename of the input file is prefixed by `subsampled_`. Note that the path will not be retained, and the output file will be written to the current working directory. Similarly, the Logs file will be stored in the current working directory.
 
-To generate subsampled file and Logs file in the Decombinator directory, run from within Decombinator:
+To generate a subsampled file and Logs file in the Decombinator directory, run from within Decombinator:
 ```
 python /path/to/Decombinator-Tools/RandomlySample.py -in infile.n12 -n 50
 ```
@@ -149,12 +149,12 @@ How to run:
 ```
 python RunTestData.py 
 ```
-Note that the output files  and Log files will be stored in the current working directory (Decombinator-Tools). To generate output and Log files in the Decombinator directory, run from within Decombinator directory:
+Note that the output files and Log files will be stored in the current working directory (Decombinator-Tools). To generate output and Log files in the Decombinator directory, run from within Decombinator directory:
 ```
 python /path/to/Decombinator-Tools/RunTestData.py 
 ```
 
-The RunTestData script can be supplied with two checkpoint arguments, `-c1` and `-c2` that tell the script at which part in the pipeline to start from and end at. For example, to the test data through only Demultiplexor and Decombinator, run:
+The RunTestData script can be supplied with two checkpoint arguments, `-c1` and `-c2` that tell the script at which part in the pipeline to start from and end at. For example, test data through only Demultiplexor and Decombinator, run:
 ```
 python /path/to/Decombinator-Tools/RunTestData.py -c1 demultiplexor -c2 decombinator
 ```
@@ -170,7 +170,7 @@ This script should be run using **Python 3**.
 
 This script can be used to generate a histogram plot displaying the frequency of average UMI cluster sizes present in collapsed TCR repertoire data. It should be run as an optional analysis tool in the Collapsinator stage of the Decombinator pipeline.
 
-If Collapsinator has been run using the `-uh` argument, a csv file will be saved to the logs folder with the suffix `_UMIhistogram.csv`. Supplying this file to the UMIHistogram script will generate the histogram.
+If Collapsinator has been run using the `-uh` argument, a `.csv` file will be saved to the logs folder with the suffix `_UMIhistogram.csv`. Supplying this file to the UMIHistogram script will generate the histogram.
 
 How to run:
 ```
@@ -187,19 +187,40 @@ python UMIHistogram.py -in /path/to/filename_UMIhistogram.csv -b 80 -c '#34623F'
 ```
 
 ---
-<h1 id="recipes">Recipes</h1>
+<h1 id="run_scripts">run_scripts</h1>
 
-The recipes folder contains a number of bash scripts that can be used or modified as a shorthand to run over multiple input files in a directory.
+The run_scripts folder contains a number of bash scripts that can be used or modified as a shorthand to run over multiple input files in a directory.
+
+---
+### v4.3_cs_cluster_scripts
+
+*This guide is only relevant for members of the Innate2Adaptive group at UCL. At present it is designed to work with batches that have samples generated by a single protocol (e.g. RACE).*
+
+1. You will need access to the UCL CS HPC cluster which can be requested [here](https://hpc.cs.ucl.ac.uk/account-form/).
+2. You will need to be added to the `inn2adap` user group to get access to our project storage. Request this when you obtain your login details.
+3. Create a new batch directory in the project directory and place your `.tar` file there.
+    - See the UCL CS HPC [website](https://hpc.cs.ucl.ac.uk/ssh-scp/) for information on how to set up port-forwarding if you need to `scp` data to the cluster.
+4. Copy the contents of `Decombinator-Tools/v4.3_cs_cluster_scripts` to your batch directory.
+5. Check `dcr_job.qsub.sh` to make sure it has the correct pipeline settings for your data.
+    - If you have samples processed by different protocols in your batch, you will have to split them manually and edit `unpack_and_submit.sh` to skip the already completed steps.
+6. Run `source unpack_and_submit.sh` to submit all samples in the `.tar` file to the job scheduler.
+7. Check if your jobs begin running successfully with `qstat`.
+8. Create a `.csv` with your batch name and the order in which you would like your samples presented in the summary sheet.
+9. Once all jobs are complete, run `source repack_and_summarise.sh` to package the results for transfer to the RDS.
+
+---
+
+Additional scripts:
 
 * [Decombinator.sh](#decombinator.sh)
 * [Collapsinator.sh](#collapsinator.sh)
 
 <h3 id="decombinator.sh">Decombinator.sh</h3>
 
-This script will run Decombinator for all `.fq` and `.fq.gz` files in the Decombinator directory. Note that this script assumes the Decombinator and Decombinator-Tools repositories are located in the same parent directory. Otherwise a path to the Decombinator repository should be supplied. Additionally, the `Logs` folder for these files will be located in the working directory from which the script is run - to keep log files in the Decombinator repository, follow step 4 below.
+This script will run Decombinator for all `.fq` and `.fq.gz` files in the Decombinator directory. Note that this script assumes the Decombinator and Decombinator-Tools repositories are located in the same parent directory. Otherwise, a path to the Decombinator repository should be supplied. Additionally, the `Logs` folder for these files will be located in the working directory from which the script is run - to keep log files in the Decombinator repository, follow step 4 below.
 
 How to run:
-1. from recipes folder:
+1. from run_scripts folder:
 ```
 ./Decombinator.sh
 ```
@@ -209,15 +230,15 @@ source Decombinator.sh
 ```
 2. from Decombinator-Tools folder:
 ```
-./recipes/Decombinator.sh
+./run_scripts/Decombinator.sh
 ```
 or
 ```
-source recipes/Collaspinsator.sh
+source run_scripts/Collaspinsator.sh
 ```
 3. from Decombinator folder:
 ```
-source /path/to/Decombinator-Tools/recipes/Decombinator.sh
+source /path/to/Decombinator-Tools/run_scripts/Decombinator.sh
 ```
 4. Supplying path to Decombinator repository
 ```
@@ -225,10 +246,10 @@ source Decombinator.sh /path/to/Decombinator
 ```
 <h3 id="collapsinator.sh">Collapsinator.sh</h3>
 
-This script will run Collapsinator for all `.n12.gz` files in the Decombinator directory in parallel. Note that this script assumes the Decombinator and Decombinator-Tools repositories are located in the same parent directory. Otherwise a path to the Decombinator repository should be supplied. Additionally, the `Logs` folder for these files will be located in the working directory from which the script is run - to keep log files in the Decombinator repository, follow step 4 below.
+This script will run Collapsinator for all `.n12.gz` files in the Decombinator directory in parallel. Note that this script assumes the Decombinator and Decombinator-Tools repositories are located in the same parent directory. Otherwise, a path to the Decombinator repository should be supplied. Additionally, the `Logs` folder for these files will be located in the working directory from which the script is run - to keep log files in the Decombinator repository, follow step 4 below.
 
 How to run:
-1. from recipes folder:
+1. from run_scripts folder:
 ```
 ./Collapsinator.sh
 ```
@@ -238,15 +259,15 @@ source Collapsinator.sh
 ```
 2. from Decombinator-Tools folder:
 ```
-./recipes/Collapsinator.sh
+./run_scripts/Collapsinator.sh
 ```
 or
 ```
-source recipes/Collaspinsator.sh
+source run_scripts/Collaspinsator.sh
 ```
 3. from Decombinator folder:
 ```
-source /path/to/Decombinator-Tools/recipes/Collapsinator.sh
+source /path/to/Decombinator-Tools/run_scripts/Collapsinator.sh
 ```
 4. Supplying path to Decombinator repository
 ```
@@ -254,7 +275,7 @@ source Collapsinator.sh /path/to/Decombinator
 ```
 <h2 id="job-scripts">Job Scripts</h2>
 
-The Job Scripts directory contains an example job script for running the [Decombinator Test Data](https://github.com/innate2adaptive/Decombinator-Test-Data) compatible with the University College London cluster setup. Some modification may be required for other setups.
+The Job Scripts directory contains an example job script for running the [Decombinator Test Data](https://github.com/innate2adaptive/Decombinator-Test-Data) compatible with the University College London cluster setup. Some modifications may be required for other setups.
 
 * You will need to install Decombinator-Tools in your local space on the cluster. After logging in, run the command:
     ```
@@ -267,11 +288,11 @@ The Job Scripts directory contains an example job script for running the [Decomb
     ```
     mkdir Scratch/DCRExample
     ```
-* Next you will need to modify step 6 labelled in the job script `testdatajob.sh`, replacing `<user-id>` with your own user id. If you have named your output directory differently to `DCRExample`, this should also be changed in step 6. If you have named your conda environment differently to the example environment, this shop be changed in step 9 in the script.  
+* Next, you will need to modify step 6 labelled in the job script `testdatajob.sh`, replacing `<user-id>` with your own user id. If you have named your output directory differently to `DCRExample`, this should also be changed in step 6. If you have named your conda environment differently from the example environment, this shop be changed in step 9 in the script.  
 
 * After making these changes, submit your job:
    ```
-   qsub recipes/jobscripts/testdatajob.sh
+   qsub run_scripts/jobscripts/testdatajob.sh
    ```
 * You can monitor your job using the `qstat` command. The initial state should show `qw` when waiting in the queue, and `r` when the job is running.
 * The output of running the test data will be saved to `Scratch/DCRExample/files_from_job_<job_number>.tar.gz`. Extract your data, replacing `<job_number>` with your cluster job number, using:
@@ -305,4 +326,4 @@ Let A be the overlap matrix. Then for any two samples *i,j*,
 * If comparing all samples in a particular sequencing run, note that as some runs contain several samples from the same individual/s, 
  the absolute expected 'background' overlap will differ between runs.
 
-* The script calculates and plots the overlap of the alpha files first followed by beta.
+* The script calculates and plots the overlap of the alpha files first followed by the beta.
