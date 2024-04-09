@@ -17,6 +17,7 @@
 *.png
 *.tsv
 *.txt
+*.json
 
 # Logs folder
 Logs
