@@ -6,7 +6,7 @@
 2. You will need to be added to the `inn2adap` user group to get access to our project storage. Ask for another member of the group to give you the directory path and request access for you when you obtain your login details.
     - In order to `cd` to the project storage you will need to directly `cd` to the project, due to dynamic mounting, the directory will not appear in `ls` or a directory GUI.
     - For convenience, create a bash script in your home directory with a `cd` command to the project directory.
-3. Create a new batch directory in the project directory and place your `.tar` file there.
+3. Create a new batch directory in the project directory and place your `.tar` file there, make sure the `.tar` file is also backed up to the RDS as the project directory is not itself backed up.
     - See the UCL CS HPC [website](https://hpc.cs.ucl.ac.uk/ssh-scp/) for information on how to set up port-forwarding if you need to `scp` data to the cluster.
 4. Copy the contents of `Decombinator-Tools/v4.3_cs_cluster_scripts` to your batch directory.
 5. Check `dcr_job.qsub.sh` to make sure it has the correct pipeline settings for your data.
@@ -15,3 +15,4 @@
 7. Check if your jobs begin running successfully with `qstat`.
 8. Create a `.csv` with your batch name and the order in which you would like your samples presented in the summary sheet.
 9. Once all jobs are complete, run `source repack_and_summarise.sh` to package the results for transfer to the RDS.
+10. When you have verified that the data is safely saved onto the RDS, delete the batch directory containing the analysis on the CS HPC cluster. Only you have the permissions to delete this folder and we have a 500GB limit in the project directory.
