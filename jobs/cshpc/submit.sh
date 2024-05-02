@@ -9,7 +9,7 @@ TARNAME=$(find . -type f -name *.tar)
 tar -xvf $TARNAME
 
 TEMPDIR=temp
-# Rember to change job script based on species and protocol
+# Remember to change job script based on species and protocol
 JOB=dcr_job.qsub.sh
 
 mkdir $TEMPDIR
