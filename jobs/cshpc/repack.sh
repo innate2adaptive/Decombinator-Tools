@@ -27,7 +27,7 @@ fi
 read -p "Please enter the pool ID: " POOLID
 
 if [ -f $POOLID.csv ]; then
-    echo "$POOLID.csv exists, proceeding with repacking."
+    echo "$POOLID.csv exists, proceeding with repacking. This will take 5 minutes..."
 else
     echo "$POOLID.csv does not exist, please add it to the directory."
     echo 'Exiting.'
@@ -39,6 +39,7 @@ else
 fi
 
 # RDS Raw directory structure
+echo "Creating raw data storage directory..."
 mkdir raw
 mkdir raw/$POOLID
 mkdir raw/$POOLID/DualIndexDemultiplexed
@@ -46,6 +47,7 @@ cp $POOLID.csv raw/$POOLID
 find temp/ -type f -name "*.fq*" -exec cp {} raw/$POOLID/DualIndexDemultiplexed/ \;
 
 # RDS Processed directory structure
+echo "Creating processed data storage directory..."
 mkdir processed
 mkdir processed/$POOLID
 mkdir processed/$POOLID/decombined
@@ -59,6 +61,7 @@ find temp/ -type f -name "*.tsv*" -exec cp {} processed/$POOLID/translated/ \;
 find temp/ -type f -name "*.csv*" -exec cp {} processed/$POOLID/logs/ \;
 
 # Generate summary sheet
+echo "Creating summary sheet..."
 source /share/apps/source_files/python/python-3.10.0.source
 python3 $TOOLS/analysis/LogSummary.py -l processed/$POOLID/logs/ -o processed/$POOLID/Summary_$POOLID.csv -s $POOLID.csv
 
