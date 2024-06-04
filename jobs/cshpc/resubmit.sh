@@ -1,6 +1,6 @@
 #!/bin/bash
 
-read -p "Enter the number of TSV files expected per folder: " EXPECTED_COUNT
+read -p "Enter the number of TSV files expected per directory in temp: " EXPECTED_COUNT
 
 STARTDIR=$(pwd)
 TEMPDIR=temp
