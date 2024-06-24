@@ -14,7 +14,7 @@
     - If you have samples processed by different protocols in your batch, you will have to split them manually and edit `submit.sh` to skip the already completed steps.
 6. Run `sh submit.sh` to submit all samples in the `.tar` file to the job scheduler.
 7. Check if your jobs begin running successfully with `qstat`.
-8. TROUBLESHOOTING: If a subset of jobs fails to complete, it may be due to memory or runtime limits. Investigate why using the `.o` files in each job subdirectory (feel free to ask for help with this), edit the copy of `dcr_job.qsub.sh` located in the top level of your batch directory, and then run `sh resubmit.sh`. This will resubmit all jobs that failed to complete, but using your new memory or runtime limits.
+8. TROUBLESHOOTING: If a subset of jobs fails to complete, it may be due to memory or runtime limits. Investigate why using `summarise.sh` script. More detailed investigation can be performed using the `.o` files in each job subdirectory (feel free to ask for help with this). Edit the copy of `dcr_job.qsub.sh` located in the top level of your batch directory, and then run `sh resubmit.sh`. This will resubmit all jobs that failed to complete, but using your new memory or runtime limits.
     - If your `.o` file ends with `MemoryError`, increase the memory requested in `dcr_job.qsub.sh`.
     - If your `.o` ends without any error message, the job likely hit the runtime limit. Increase the runtime requested in `dcr_job.qsub.sh`.
     - For other errors, inspect the error stack message carefully, as often it will be related to naming convention issues. Feel free to open an issue on this repository for help.
