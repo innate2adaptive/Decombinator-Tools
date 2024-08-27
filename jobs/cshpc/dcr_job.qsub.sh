@@ -2,8 +2,8 @@
 # Runtime is either seconds or hours:min:sec
 # 12hr selected to allow for instances of extended collapsing and server delay
 
-#$ -l tmem=15G
-#$ -l h_vmem=15G
+#$ -l tmem=32G
+#$ -l h_vmem=32G
 #$ -l h_rt=24:00:00
 
 # These are optional flags but you probably want them in all jobs
@@ -12,6 +12,7 @@
 #$ -j y
 #$ -N tcr_pipeline
 #$ -cwd
+#$ -l h=!arbuckle
 
 # Most recent sequencing protocols return raw data that is already demultiplexed.
 # Therefore, for most cases nowadays, running Demultiplexor is no longer required.
@@ -37,8 +38,8 @@ echo $FILENAME
 
 echo "Species assumed to be Homo sapiens, please specify if not"
 echo "=== Alpha Chain Pipeline ==="
-decombinator -fq $FILENAME -br R2 -bl 42 -c a -ol M13 -tfdir $TAGS
+decombinator pipeline -in $FILENAME -br R2 -bl 42 -c a -ol M13 -tfdir $TAGS
 echo "=== Beta Chain Pipeline ==="
-decombinator -fq $FILENAME -br R2 -bl 42 -c b -ol M13 -tfdir $TAGS
+decombinator pipeline -in $FILENAME -br R2 -bl 42 -c b -ol M13 -tfdir $TAGS
 
 echo "Job complete."
