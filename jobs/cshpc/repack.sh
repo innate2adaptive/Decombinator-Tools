@@ -9,7 +9,7 @@ TOOLS=$PROJECTDIR/Decombinator-Tools
 
 (return 0 2>/dev/null) && sourced=1 || sourced=0
 
-read -p "How many .tsv files are you expecting?: " EXPECTED
+read -p "How many .tsv files in total are you expecting?: " EXPECTED
 ACTUAL=$(find temp/ -type f -name "*tsv*" | wc -l)
 
 if [ $ACTUAL -eq $EXPECTED ]; then
