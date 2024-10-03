@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # A script to be used alongside decombinator to automatically unpack RNAseq data from Novogene
 # and submit for processing on the CS HPC cluster 
 
