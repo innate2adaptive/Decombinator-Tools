@@ -1,6 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Script to check numbers of TSVs in directories and submit jobs based on count threshold
 
-read -p "Enter the number of TSV files expected per directory in temp: " EXPECTED_COUNT
+read -ep "Enter the number of TSV files expected per directory in temp: " EXPECTED_COUNT
 
 STARTDIR=$(pwd)
 TEMPDIR=temp
