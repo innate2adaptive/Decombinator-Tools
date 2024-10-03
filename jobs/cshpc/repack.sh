@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # A script to repack the directory structure created by `submit.sh`
 # into the archival structures on the RDS in the raw and processed folders.
 # Additionally requires a Sample Sheet with the desired odering of samples
@@ -9,7 +9,7 @@ TOOLS=$PROJECTDIR/Decombinator-Tools
 
 (return 0 2>/dev/null) && sourced=1 || sourced=0
 
-read -p "How many .tsv files are you expecting?: " EXPECTED
+read -ep "How many .tsv files are you expecting?: " EXPECTED
 ACTUAL=$(find temp/ -type f -name "*tsv*" | wc -l)
 
 if [ $ACTUAL -eq $EXPECTED ]; then
@@ -24,7 +24,7 @@ else
     fi 
 fi
 
-read -p "Please enter the pool ID: " POOLID
+read -ep "Please enter the pool ID: " POOLID
 
 if [ -f $POOLID.csv ]; then
     echo "$POOLID.csv exists, proceeding with repacking. This will take 5 minutes..."
