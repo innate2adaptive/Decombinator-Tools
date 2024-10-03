@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # A script to generate a summary sheet from the current logs in the temp folder.
 
 PROJECTDIR=/SAN/colcc/tcr_decombinator
@@ -6,7 +6,7 @@ TOOLS=$PROJECTDIR/Decombinator-Tools
 
 (return 0 2>/dev/null) && sourced=1 || sourced=0
 
-read -p "Please enter the pool ID: " POOLID
+read -ep "Please enter the pool ID: " POOLID
 
 if [ -f $POOLID.csv ]; then
     echo "$POOLID.csv exists, proceeding with summarising."
