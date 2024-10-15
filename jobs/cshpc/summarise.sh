@@ -7,7 +7,7 @@ TARGET_DIR=temp/
 
 (return 0 2>/dev/null) && sourced=1 || sourced=0
 
-read -epr "Please enter the pool ID: " POOLID
+read -r -ep "Please enter the pool ID: " POOLID
 
 if [ -f "$POOLID" ]; then
     echo "$POOLID exists, proceeding with summarising."
