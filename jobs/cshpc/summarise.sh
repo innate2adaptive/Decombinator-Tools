@@ -7,9 +7,9 @@ TARGET_DIR=temp/
 
 (return 0 2>/dev/null) && sourced=1 || sourced=0
 
-read -ep "Please enter the pool ID: " POOLID
+read -epr "Please enter the pool ID: " POOLID
 
-if [ -f $POOLID ]; then
+if [ -f "$POOLID" ]; then
     echo "$POOLID exists, proceeding with summarising."
 else
     echo "$POOLID does not exist, please add it to the directory."
@@ -36,8 +36,6 @@ find $TARGET_DIR -type f -name "*.csv" | awk -v dest_dir="$DEST_DIR" -F'[_.]' '{
 	sub(/\.csv$/, "", filename);
 	match(filename, /[0-9]*$/);
 
-	print filename
-
 	if (RSTART > 0) {
 		seq_num = substr(filename, RSTART);
 		raw_id = substr(no_date_name, 1, RSTART - 1);
@@ -52,7 +50,6 @@ find $TARGET_DIR -type f -name "*.csv" | awk -v dest_dir="$DEST_DIR" -F'[_.]' '{
 		seen_date[id] = numeric_date;
 		seen_seq[id] = seq_num;
 		files[id] = $0;
-		print files[id] "replaces" files[id];
 	}
 
 } END {
@@ -66,7 +63,7 @@ find $TARGET_DIR -type f -name "*.csv" | awk -v dest_dir="$DEST_DIR" -F'[_.]' '{
 echo "Creating temporary summary sheet..."
 source /share/apps/source_files/python/python-3.11.9.source
 current_time=$(date +"%Y-%m-%d_%H-%M-%S")
-python3 $TOOLS/analysis/LogSummary.py -l temp_logs/ -o Summary_${current_time}_${POOLID} -s $POOLID
+python3 $TOOLS/analysis/LogSummary.py -l temp_logs/ -o "Summary_${current_time}_${POOLID}" -s "$POOLID"
 
 # Remove temp logs
 echo "Removing temporary directory..."
