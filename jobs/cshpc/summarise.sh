@@ -33,11 +33,11 @@ find $TARGET_DIR -type f -name "*.csv" | awk -v dest_dir="$DEST_DIR" -F'[_.]' '{
 	date = name_parts[1] "_" name_parts[2] "_" name_parts[3];
 	numeric_date = name_parts[1] name_parts[2] name_parts[3];
 	no_date_name = substr(filename, length(date) + 2);
-	sub(/\.csv$/, "", filename);
-	match(filename, /[0-9]*$/);
+	sub(/\.csv$/, "", no_date_name);
+	match(no_date_name, /[0-9]*$/);
 
 	if (RSTART > 0) {
-		seq_num = substr(filename, RSTART);
+		seq_num = substr(no_date_name, RSTART);
 		raw_id = substr(no_date_name, 1, RSTART - 1);
 	} else {
 		seq_num = 0;
