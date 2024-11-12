@@ -36,6 +36,10 @@ echo "Decombinator version $(decombinator --version)"
 FILENAME=$(find . -type f -name *_1.fq.gz -exec basename {} \;)
 echo $FILENAME
 
+# For RACE: -br R2 -bl 42 -ol M13, for FUME: -br R1 -bl 22 -ol i8_single
+# If running FUME, run vsearch on paired-end reads and submit merged fastq
+# Delete the respective lines for alpha/beta if unneeded e.g. alpha has already
+# run and this is a resubmission, or if running library with beta chain only
 echo "Species assumed to be Homo sapiens, please specify if not"
 echo "=== Alpha Chain Pipeline ==="
 decombinator pipeline -in $FILENAME -br R2 -bl 42 -c a -ol M13 -tfdir $TAGS
