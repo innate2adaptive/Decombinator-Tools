@@ -51,8 +51,8 @@ OUT=${FILENAME/$pattern/merge.fq}
 if [[ -f "$R2" ]]; then
     echo "Merging $FILENAME with $R2"
     vsearch --fastq_mergepairs "${FILENAME}" \
-        --reverse "$R2 "\
-        --fastqout "$OUT "\
+        --reverse "$R2"\
+        --fastqout "$OUT"\
         --fastq_allowmergestagger \
         --log Logs/"${FILENAME/$pattern/merge.log}"
 else
