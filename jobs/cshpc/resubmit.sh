@@ -6,7 +6,7 @@ read -ep "Enter the number of TSV files expected per directory in temp: " EXPECT
 STARTDIR=$(pwd)
 TEMPDIR=temp
 # Rember to change job script based on species and protocol
-JOB=dcr_job.qsub.sh
+JOB=dcr_job_race.qsub.sh
 
 for i in $TEMPDIR/*
 do

@@ -10,7 +10,7 @@ tar -xvf $TARNAME
 
 TEMPDIR=temp
 # Remember to change job script based on species and protocol
-JOB=dcr_job.qsub.sh
+JOB=dcr_job_race.qsub.sh
 
 mkdir $TEMPDIR
 
