@@ -49,7 +49,7 @@ replacement="2.fq.gz"
 R2="${FILENAME/$pattern/$replacement}"
 OUT=${FILENAME/$pattern/merge.fq}
 if [[ -f "$R2" ]]; then
-    echo "Merging $FILENAME with $R2"
+    echo "Merging $FILENAME with $R2..."
     vsearch --fastq_mergepairs "${FILENAME}" \
         --reverse "$R2"\
         --fastqout "$OUT"\
@@ -59,12 +59,14 @@ else
     echo "$R2, the paired read for $FILENAME could not be found."
     exit
 fi
+echo "Merge complete."
 
 # For RACE: -br R2 -bl 42 -ol M13, for FUME: -br R1 -bl 22 -ol i8_single
 # If running FUME, run vsearch on paired-end reads and submit merged fastq
 # Delete the respective lines for alpha/beta if unneeded e.g. alpha has already
 # run and this is a resubmission, or if running library with beta chain only
-echo "Species assumed to be Homo sapiens, please specify if not"
+echo "Running decombinator pipeline on merged reads."
+echo "Species assumed to be Homo sapiens, please specify if not."
 echo "=== Beta Chain Pipeline ==="
 decombinator pipeline -in "$OUT" -br R1 -bl 22 -c b -ol i8_single -tfdir "$TAGS"
 
