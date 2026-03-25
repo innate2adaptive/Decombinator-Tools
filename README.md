@@ -8,6 +8,7 @@ This repository contains scripts that may be helpful when working with the [Deco
   * [Collapsed Sample Overlap](#collapsed-sample-overlap)
   * [Log Summary](#log-summary)
   * [Randomly Sample](#randomly-sample)
+  * [TCR Repertoire Plots](#tcr-repertoire-plots)
   * [UMI Histogram](#umi-histogram)
 * [Formatting](#formatting)
   * [DCR to Gene Name](#dcr-to-gene-name)
@@ -90,6 +91,78 @@ python /path/to/Decombinator-Tools/RandomlySample.py -in infile.n12 -n 50
 A full list of arguments can be viewed by running:
 ```
 python RandomlySample.py -h
+```
+
+---
+
+### TCR Repertoire Plots
+
+This script should be run using **Python 3**.
+
+This script reads one or more gzipped TSV files produced by the Decombinator pipeline and generates three plots summarising repertoire composition and sample overlap. Input files are expected to contain the standard Decombinator output columns including `sequence`, `duplicate_count`, and `av_UMI_cluster_size`.
+
+#### Dependencies
+
+Install the required packages before running:
+```
+pip install polars seaborn matplotlib numpy
+```
+
+#### How to run
+
+```
+python tcr_analysis.py PATTERN [PATTERN ...] [-o DIR] [--species-col COLUMN]
+```
+
+The positional `PATTERN` argument accepts standard shell glob syntax. Use `**` for recursive directory matching:
+
+```
+python tcr_analysis.py 'data/*.tsv.gz'
+```
+```
+python tcr_analysis.py 'data/**/*.tsv.gz'
+```
+
+Multiple patterns can be supplied together:
+```
+python tcr_analysis.py 'cohort_a/**/*.tsv.gz' 'cohort_b/**/*.tsv.gz'
+```
+
+#### Output
+
+Three plots are saved to the output directory (default: `tcr_plots/`):
+
+| File | Description |
+|---|---|
+| `jaccard_heatmap.png` | Pairwise Jaccard index heatmap across all input files |
+| `scatter_tcrs_vs_umi.png` | Scatter plot of unique TCR count vs total UMI count per file (log-log scale) |
+| `umi_histograms/<stem>_umi_hist.png` | Per-file histogram of `av_UMI_cluster_size` distribution |
+
+The Jaccard heatmap compares sets of unique values in a chosen column across samples. The main diagonal is masked so that the colour scale reflects off-diagonal overlap only. The colorbar maximum is set dynamically to the highest observed pairwise overlap value.
+
+#### Arguments
+
+| Argument | Description |
+|:---:|---|
+| `PATTERN` | One or more glob patterns for input `.tsv.gz` files. Quoted patterns with `**` will match recursively across subdirectories. |
+| `-o` | Output directory for saved plots (default: `tcr_plots`). Created if it does not exist. |
+| `--species-col` | Column whose unique values are used as the set for Jaccard index calculation (default: `sequence`). Common alternatives include `junction_aa` for amino acid clonotype overlap or `decombinator_id` for DCR-level overlap. |
+
+#### Examples
+
+Plot all samples in a single directory, saving to `results/`:
+```
+python tcr_analysis.py 'samples/*.tsv.gz' -o results
+```
+
+Compare samples recursively across nested directories using junction amino acid sequences as the overlap unit:
+```
+python tcr_analysis.py 'study/**/*.tsv.gz' -o results --species-col junction_aa
+```
+
+A full list of arguments can be viewed by running:
+```
+python tcr_analysis.py -h
 ```
 
 ---
