@@ -8,6 +8,7 @@ This repository contains scripts that may be helpful when working with the [Deco
   * [Collapsed Sample Overlap](#collapsed-sample-overlap)
   * [Log Summary](#log-summary)
   * [Randomly Sample](#randomly-sample)
+  * [TCR Repertoire Plots](#tcr-repertoire-plots)
   * [UMI Histogram](#umi-histogram)
 * [Formatting](#formatting)
   * [DCR to Gene Name](#dcr-to-gene-name)
@@ -90,6 +91,78 @@ python /path/to/Decombinator-Tools/RandomlySample.py -in infile.n12 -n 50
 A full list of arguments can be viewed by running:
 ```
 python RandomlySample.py -h
+```
+
+---
+
+### TCR Repertoire Plots
+
+This script should be run using **Python 3**.
+
+This script reads one or more gzipped TSV files produced by the Decombinator pipeline and generates three plots summarising repertoire composition and sample overlap. Input files are expected to contain the standard Decombinator output columns including `sequence`, `duplicate_count`, and `av_UMI_cluster_size`.
+
+#### Dependencies
+
+Install the required packages before running:
+```
+pip install polars seaborn matplotlib numpy
+```
+
+#### How to run
+
+```
+python tcr_analysis.py PATTERN [PATTERN ...] [-o DIR] [--species-col COLUMN]
+```
+
+The positional `PATTERN` argument accepts standard shell glob syntax. Use `**` for recursive directory matching:
+
+```
+python tcr_analysis.py 'data/*.tsv.gz'
+```
+```
+python tcr_analysis.py 'data/**/*.tsv.gz'
+```
+
+Multiple patterns can be supplied together:
+```
+python tcr_analysis.py 'cohort_a/**/*.tsv.gz' 'cohort_b/**/*.tsv.gz'
+```
+
+#### Output
+
+Three plots are saved to the output directory (default: `tcr_plots/`):
+
+| File | Description |
+|---|---|
+| `jaccard_heatmap.png` | Pairwise Jaccard index heatmap across all input files |
+| `scatter_tcrs_vs_umi.png` | Scatter plot of unique TCR count vs total UMI count per file (log-log scale) |
+| `umi_histograms/<stem>_umi_hist.png` | Per-file histogram of `av_UMI_cluster_size` distribution |
+
+The Jaccard heatmap compares sets of unique values in a chosen column across samples. The main diagonal is masked so that the colour scale reflects off-diagonal overlap only. The colorbar maximum is set dynamically to the highest observed pairwise overlap value.
+
+#### Arguments
+
+| Argument | Description |
+|:---:|---|
+| `PATTERN` | One or more glob patterns for input `.tsv.gz` files. Quoted patterns with `**` will match recursively across subdirectories. |
+| `-o` | Output directory for saved plots (default: `tcr_plots`). Created if it does not exist. |
+| `--species-col` | Column whose unique values are used as the set for Jaccard index calculation (default: `sequence`). Common alternatives include `junction_aa` for amino acid clonotype overlap or `decombinator_id` for DCR-level overlap. |
+
+#### Examples
+
+Plot all samples in a single directory, saving to `results/`:
+```
+python tcr_analysis.py 'samples/*.tsv.gz' -o results
+```
+
+Compare samples recursively across nested directories using junction amino acid sequences as the overlap unit:
+```
+python tcr_analysis.py 'study/**/*.tsv.gz' -o results --species-col junction_aa
+```
+
+A full list of arguments can be viewed by running:
+```
+python tcr_analysis.py -h
 ```
 
 ---
@@ -214,16 +287,17 @@ The run_scripts folder contains a number of bash scripts that can be used or mod
 3. Create a new batch directory in the project directory and place your `.tar` file there, make sure the `.tar` file is also backed up to the RDS as the project directory is not itself backed up.
     - See the UCL CS HPC [website](https://hpc.cs.ucl.ac.uk/ssh-scp/) for information on how to set up port-forwarding if you need to `scp` data to the cluster.
 4. Copy the contents of `Decombinator-Tools/jobs/cshpc/` to your batch directory.
-    - There are 4 scripts: `submit.sh` which you will call to unpack your `.tar` file and submit all of your samples as jobs, `dcr_job.qsub.sh` is the job script which instructs the cluster how to treat your task, `resubmit.sh` is a handy script that you can use to resubmit any jobs which fail due to various reasons (see the troubleshooting section below), and `repack.sh` which will format your processed data into the Chain lab standard storage format.
-5. Check `dcr_job.qsub.sh` to make sure it has the correct pipeline settings for your data.
+    - There are 6 scripts: `submit.sh` which you will call to unpack your `.tar` file and submit all of your samples as jobs, `dcr_job_XXXX.qsub.sh` is the job script which instructs the cluster how to treat your task - there is a variant for each library prep protocol that the lab uses (RACE and FUME), `resubmit.sh` is a handy script that you can use to resubmit any jobs which fail due to various reasons (see the troubleshooting section below), `summarise.sh` which can generate useful troubleshooting information from logs, and `repack.sh` which will format your processed data into the Chain lab standard storage format.
+5. By default, `submit.sh` uses `dcr_job_race.qsub.sh`. Alter this if you are running FUME samples and check `dcr_job_XXXX.qsub.sh` to make sure it has the correct pipeline settings for your data.
     - If you have samples processed by different protocols in your batch, you will have to split them manually and edit `submit.sh` to skip the already completed steps.
 6. Run `sh submit.sh` to submit all samples in the `.tar` file to the job scheduler.
 7. Check if your jobs begin running successfully with `qstat`.
-8. TROUBLESHOOTING: If a subset of jobs fails to complete, it may be due to memory or runtime limits. Investigate why using the `.o` files in each job subdirectory (feel free to ask for help with this), edit the copy of `dcr_job.qsub.sh` located in the top level of your batch directory, and then run `sh resubmit.sh`. This will resubmit all jobs that failed to complete, but using your new memory or runtime limits.
+8. **TROUBLESHOOTING**: If a subset of jobs fails to complete, it may be due to memory or runtime limits. Investigate why using `summarise.sh` script. More detailed investigation can be performed using the `.o` files in each job subdirectory (feel free to ask for help with this). Edit the copy of `dcr_job_XXXX.qsub.sh` located in the top level of your batch directory, and then run `sh resubmit.sh`. This will resubmit all jobs that failed to complete, but using your new memory or runtime limits.
     - If your `.o` file ends with `MemoryError`, increase the memory requested in `dcr_job.qsub.sh`.
     - If your `.o` ends without any error message, the job likely hit the runtime limit. Increase the runtime requested in `dcr_job.qsub.sh`.
     - For other errors, inspect the error stack message carefully, as often it will be related to naming convention issues. Feel free to open an issue on this repository for help.
 9. Create a `.csv` with your batch name and the order in which you would like your samples presented in the summary sheet.
+10. To inspect qc metrics (as defined in `qc.py` in this repo), run `qc.sh`. By default this points at `temp/*/*.tsv.gz`, but the script will give you an opportunity to provide an alternate path.
 10. Once all jobs are complete, check you have all the results you expected with `find temp/ -type f -name "*tsv*" | wc -l` (remove `| wc -l` to see filenames rather than counts), and then run `sh summarise.sh` to package the results for transfer to the RDS.
 11. When you have verified that the data is safely saved onto the RDS, delete the batch directory containing the analysis on the CS HPC cluster. Only you have the permissions to delete this folder and we have a 500GB limit in the project directory.
 
