@@ -110,6 +110,8 @@ def plot_jaccard_heatmap(
         for j, b in enumerate(names):
             matrix[i, j] = jaccard(sets[a], sets[b])
     np.fill_diagonal(matrix, np.nan)
+    # Dynamic upper bound: max of off-diagonal (non-NaN) values
+    vmax = float(np.nanmax(matrix)) if not np.all(np.isnan(matrix)) else 1.0
 
     short_names = [Path(n).stem for n in names]
 
@@ -124,7 +126,7 @@ def plot_jaccard_heatmap(
         xticklabels=short_names,
         yticklabels=short_names,
         vmin=0,
-        vmax=1,
+        vmax=vmax,
         annot=n <= 20,
         fmt=".2f",
         cmap="viridis",
