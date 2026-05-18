@@ -1,100 +1,121 @@
 # Written by Mazlina Ismail : July 2017
 # Updated by Thomas Peacock: August 2020
-# Updated by Thomas Peacock: July 2021 
+# Updated by Thomas Peacock: July 2021
 
 #### Update Notes ####
-  
-  # update for Python 3
-  # updated to run from Decombinator-Tools repository
-  # updated to sort output alphabetically or according to input sample sheet
+
+# update for Python 3
+# updated to run from Decombinator-Tools repository
+# updated to sort output alphabetically or according to input sample sheet
 
 
 ##### Pseudocode #####
 
-  # read in Decombinator log files
-  # for each file
-  # store Outputfile - this will be what we look for in the Coll log file
-  # store the values we want from the Decombinator log file
-  # read in Collapsing log files
-  # find corresponding Outputfile name in the log file
-  # store the values we want from the Collapsing log file
+# read in Decombinator log files
+# for each file
+# store Outputfile - this will be what we look for in the Coll log file
+# store the values we want from the Decombinator log file
+# read in Collapsing log files
+# find corresponding Outputfile name in the log file
+# store the values we want from the Collapsing log file
 
 # output:
-  # sample,NumberReadsInput,NumberReadsDecombined,PercentReadsDecombined,UniqueDCRsPassingFilters,TotalDCRsPassingFilters,PercentDCRPassingFilters(withbarcode),UniqueDCRsPostCollapsing,TotalDCRsPostCollapsing,PercentUniqueDCRsKept,PercentTotalDCRsKept,AverageInputTCRAbundance,AverageOutputTCRAbundance,AverageRNAduplication
+# sample,NumberReadsInput,NumberReadsDecombined,PercentReadsDecombined,UniqueDCRsPassingFilters,TotalDCRsPassingFilters,PercentDCRPassingFilters(withbarcode),UniqueDCRsPostCollapsing,TotalDCRsPostCollapsing,PercentUniqueDCRsKept,PercentTotalDCRsKept,AverageInputTCRAbundance,AverageOutputTCRAbundance,AverageRNAduplication
 
 # output comes from:
-  # field 1 = Decombinator log, field 2-4 = Decombinator log, field 5-14 = Collapsing log
+# field 1 = Decombinator log, field 2-4 = Decombinator log, field 5-14 = Collapsing log
 
 ##### How to run #####
 
-  # python LogSummary.py -l full/path/to/Logs/folder/ - o outfile.csv
+# python LogSummary.py -l full/path/to/Logs/folder/ - o outfile.csv
 
-  # or optionally include sample sheet for ordering of outfile csv:
-  #     python LogSummary.py -l full/path/to/Logs/folder/ - o outfile.csv -s samplesheet.csv
+# or optionally include sample sheet for ordering of outfile csv:
+#     python LogSummary.py -l full/path/to/Logs/folder/ - o outfile.csv -s samplesheet.csv
 
 
-# NB 
-  # assumes that all Log files are in one Log folder
-  # prints the output file to whatever directory you are in
-  # may require slight modification on line 94, depending on character separator 
-  # for grabbing filename in original log file
+# NB
+# assumes that all Log files are in one Log folder
+# prints the output file to whatever directory you are in
+# may require slight modification on line 94, depending on character separator
+# for grabbing filename in original log file
 
 ##### Py packages #####
 
+import argparse
+import sys
 from os import listdir, sep
 from os.path import isfile, join
-import sys
-import argparse
+
 
 def args():
-  parser = argparse.ArgumentParser(description='Sort Decombinator pipeline summary according to input list of samples')
-  parser.add_argument('-l', '--logpath', type=str, help='Full path to Logs folder', required=True)
-  parser.add_argument('-o', '--outfile', type=str, help='Output log summary file', required=True)
-  parser.add_argument('-s', '--sortfile', type=str, help='File listing order of samples for summary file', required=False) 
-  return parser.parse_args()
+    parser = argparse.ArgumentParser(
+        description="Sort Decombinator pipeline summary according to input list of samples"
+    )
+    parser.add_argument(
+        "-l", "--logpath", type=str, help="Full path to Logs folder", required=True
+    )
+    parser.add_argument(
+        "-o", "--outfile", type=str, help="Output log summary file", required=True
+    )
+    parser.add_argument(
+        "-s",
+        "--sortfile",
+        type=str,
+        help="File listing order of samples for summary file",
+        required=False,
+    )
+    return parser.parse_args()
+
 
 ##### Start #####
 args = args()
 
-pathToLogs = args.logpath # full path to Logs folder
-outfile = args.outfile # output log summary file
-summaryOrderFile = args.sortfile # optional file containing sample row order for summary file
+pathToLogs = args.logpath  # full path to Logs folder
+outfile = args.outfile  # output log summary file
+summaryOrderFile = (
+    args.sortfile
+)  # optional file containing sample row order for summary file
 
 # add slash to end of path if it is not supplied by user
 if pathToLogs[-1] != "/":
-  pathToLogs+="/"
+    pathToLogs += "/"
 
 onlyfiles = [f for f in listdir(pathToLogs) if isfile(join(pathToLogs, f))]
 
 sampleNam = []
 
 # get sample names from Decombinator log file
-# then get values 
+# then get values
 for f in onlyfiles:
-    
-    if 'Decombinator' in f:
-        with open(pathToLogs+sep+f, 'r') as f:
+
+    if "Decombinator" in f:
+        with open(pathToLogs + sep + f, "r") as f:
             lines = f.read().splitlines()
             for l in lines:
-                
-                if 'OutputFile' in l:
-                    spl = l.split(',')
+
+                if "OutputFile" in l:
+                    spl = l.split(",")
                     sampleNam.append(spl[1])
 
-fields = ["sample",
-          "NumberReadsInput",
-          "NumberReadsDecombined",
-          "PercentReadsDecombined",
-          "UniqueDCRsPassingFilters",
-          "TotalDCRsPassingFilters",
-          "PercentDCRPassingFilters(withbarcode)",
-          "UniqueDCRsPostCollapsing",
-          "TotalDCRsPostCollapsing",
-          "PercentUniqueDCRsKept",
-          "PercentTotalDCRsKept",
-          "AverageInputTCRAbundance",
-          "AverageOutputTCRAbundance",
-          "AverageRNAduplication"]
+fields = [
+    "sample",
+    "NumberReadsInput",
+    "NumberReadsDecombined",
+    "PercentReadsDecombined",
+    "UniqueDCRsPassingFilters",
+    "TotalDCRsPassingFilters",
+    "PercentDCRPassingFilters(withbarcode)",
+    "UniqueDCRsPostCollapsing",
+    "TotalDCRsPostCollapsing",
+    "PercentUniqueDCRsKept",
+    "PercentTotalDCRsKept",
+    "AverageInputTCRAbundance",
+    "AverageOutputTCRAbundance",
+    "AverageRNAduplication",
+    "NumberMultiTCRBarcodes",
+    "NumberMultiTCRBarcodeReads",
+    "MedianUMIsPerTCR",
+]
 
 out = {}
 
@@ -102,157 +123,157 @@ for i in sampleNam:
 
     # ignore undetermined files
     if "undetermined" in i.lower():
-      continue
+        continue
 
     string = [i]
     for j in onlyfiles:
-        
-        if 'Decombinator' in j:
-            with open(pathToLogs+sep+j, 'r') as inf:
+
+        if "Decombinator" in j:
+            with open(pathToLogs + sep + j, "r") as inf:
                 lines = inf.read().splitlines()
                 for idx, l in enumerate(lines):
-                    
-                    if 'OutputFile' in l:
-                        nam = l.split(',')[1]
-                        
+
+                    if "OutputFile" in l:
+                        nam = l.split(",")[1]
+
                         if nam == i:
                             for item in lines[idx:]:
                                 for patt in fields[1:4]:
-                                    
+
                                     if patt in item:
-                                        val = item.split(',')[1]
+                                        val = item.split(",")[1]
                                         string.append(val)
 
     for j in onlyfiles:
-        
-        if 'Collapsing' in j:
-            with open(pathToLogs+j, 'r') as inf:
+
+        if "Collapsing" in j:
+            with open(pathToLogs + j, "r") as inf:
                 lines = inf.read().splitlines()
                 for idx, l in enumerate(lines):
-                    
-                    if 'InputFile' in l:
-                        nam = l.split(',')[-1] # modify here for either
-                                              # comma or slash
+
+                    if "InputFile" in l:
+                        nam = l.split(",")[-1]  # modify here for either
+                        # comma or slash
                         if nam == i:
                             for item in lines[idx:]:
                                 for patt in fields[4:]:
 
                                     if patt in item:
-                                        val = item.split(',')[1]
+                                        val = item.split(",")[1]
                                         string.append(val)
 
     # modify filename fun
 
-    for char in ['.', '-']:
+    for char in [".", "-"]:
         if char in string[0]:
-            string[0] = string[0].replace(char, '_')
+            string[0] = string[0].replace(char, "_")
 
-    spl = string[0].split('_')[2:-2]
+    spl = string[0].split("_")[2:-2]
 
-    a_idx = [i for i, x, in enumerate(spl) if x == 'a']
-    b_idx = [i for i, x, in enumerate(spl) if x == 'b']
+    a_idx = [i for i, x, in enumerate(spl) if x == "a"]
+    b_idx = [i for i, x, in enumerate(spl) if x == "b"]
 
     # print(spl, a_idx, b_idx)
 
-    if string[0].startswith('dcr_alpha'):
+    if string[0].startswith("dcr_alpha"):
 
         for i, j in zip(a_idx, b_idx):
 
             if i < j:
-                new_nam = 'alpha_' + '_'.join(spl[:i+1])
+                new_nam = "alpha_" + "_".join(spl[: i + 1])
                 string[0] = new_nam
 
             if i > j:
-                new_nam = 'alpha_' + '_'.join(spl[j+1:])
+                new_nam = "alpha_" + "_".join(spl[j + 1 :])
                 string[0] = new_nam
 
         if not b_idx:
-            new_nam = 'alpha_' + '_'.join(spl)
+            new_nam = "alpha_" + "_".join(spl)
             string[0] = new_nam
 
-    if string[0].startswith('dcr_beta'):
+    if string[0].startswith("dcr_beta"):
 
         for i, j in zip(a_idx, b_idx):
-            
+
             if i < j:
-                new_nam = 'beta_' + '_'.join(spl[i+1:])
+                new_nam = "beta_" + "_".join(spl[i + 1 :])
                 string[0] = new_nam
 
             if i > j:
-                new_nam = 'beta_' + '_'.join(spl[:j+1])
+                new_nam = "beta_" + "_".join(spl[: j + 1])
                 string[0] = new_nam
 
         if not a_idx:
-            new_nam = 'beta_' + '_'.join(spl)
+            new_nam = "beta_" + "_".join(spl)
             string[0] = new_nam
-    
-    outStr = ','.join(string)
+
+    outStr = ",".join(string)
     out[string[0]] = outStr
 
 if summaryOrderFile:
-  # get order from file (if supplied)
-  samples = []
-  with open(summaryOrderFile, 'r') as samplefile:
-    for line in samplefile:
-      sample = line.rstrip().split(',')[0]
-      # get correct names if unusual characters in name
-      for char in ['.', '-']:
-        if char in sample:
-          sample = sample.replace(char, '_')
-      samples.append(sample)
+    # get order from file (if supplied)
+    samples = []
+    with open(summaryOrderFile, "r") as samplefile:
+        for line in samplefile:
+            sample = line.rstrip().split(",")[0]
+            # get correct names if unusual characters in name
+            for char in [".", "-"]:
+                if char in sample:
+                    sample = sample.replace(char, "_")
+            samples.append(sample)
 
+        alpha_lines = []
+        beta_lines = []
+        other_lines = []
+
+        for s in samples:
+            found_sample = False
+            for summary in out:
+                line = out[summary]
+
+                if s in summary:
+
+                    if "alpha" in summary:
+                        if line not in alpha_lines:
+                            alpha_lines.append(line)
+                            found_sample = True
+
+                    if "beta" in summary:
+                        if line not in beta_lines:
+                            beta_lines.append(line)
+                            found_sample = True
+
+                    if not "alpha" in summary and not "beta" in summary:
+                        if line not in other_lines:
+                            other_lines.append(line)
+                            found_sample = True
+
+        if not found_sample:
+            print("Warning: could not find sample containing", "'" + s + "'", "in Logs")
+
+        sorted_output_lines = alpha_lines + beta_lines + other_lines
+
+else:
+    # if no file provided, sort by chain and alphabetically
     alpha_lines = []
     beta_lines = []
     other_lines = []
-
-    for s in samples:
-      found_sample = False
-      for summary in out:
-        line = out[summary]
-
-        if s in summary:
-
-          if 'alpha' in summary:
-            if line not in alpha_lines:
-              alpha_lines.append(line)
-              found_sample = True
-                
-          if 'beta' in summary:
-            if line not in beta_lines:
-              beta_lines.append(line)
-              found_sample = True
-
-          if not 'alpha' in summary and not 'beta' in summary:
-            if line not in other_lines:
-              other_lines.append(line)
-              found_sample = True    
-
-    if not found_sample:
-        print("Warning: could not find sample containing", "'"+s+"'", "in Logs")
-
+    # split into alpha and beta (or other)
+    for sample, line in out.items():
+        if "alpha" in sample:
+            alpha_lines.append(line)
+        elif "beta" in sample:
+            beta_lines.append(line)
+        else:
+            other_lines.append(line)
+    # sort alphabetically
+    alpha_lines.sort()
+    beta_lines.sort()
+    other_lines.sort()
+    # merge for full list
     sorted_output_lines = alpha_lines + beta_lines + other_lines
 
-else:
-  # if no file provided, sort by chain and alphabetically
-  alpha_lines = []
-  beta_lines = []
-  other_lines = []
-  # split into alpha and beta (or other)
-  for sample, line in out.items():
-    if 'alpha' in sample:
-      alpha_lines.append(line)
-    elif 'beta' in sample:
-      beta_lines.append(line)
-    else:
-      other_lines.append(line)
-  # sort alphabetically
-  alpha_lines.sort()
-  beta_lines.sort()
-  other_lines.sort()
-  # merge for full list
-  sorted_output_lines = alpha_lines + beta_lines + other_lines
-
-with open(outfile, 'w') as f:
-    f.write(','.join(fields)+"\n")
+with open(outfile, "w") as f:
+    f.write(",".join(fields) + "\n")
     for string in sorted_output_lines:
         f.write("%s\n" % string)
