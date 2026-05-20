@@ -42,7 +42,6 @@
 ##### Py packages #####
 
 import argparse
-import sys
 from os import listdir, sep
 from os.path import isfile, join
 
@@ -112,9 +111,6 @@ fields = [
     "AverageInputTCRAbundance",
     "AverageOutputTCRAbundance",
     "AverageRNAduplication",
-    "NumberMultiTCRBarcodes",
-    "NumberMultiTCRBarcodeReads",
-    "MedianUMIsPerTCR",
 ]
 
 out = {}
