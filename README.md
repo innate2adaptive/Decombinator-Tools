@@ -60,20 +60,22 @@ python LogSummary.py -l /path/to/LogsFolder/ -o /path/to/outfile.csv
 
 The output `.csv` file contains the following fields:
 
-- **`sample`** — The sample name/identifier, derived from the log filename.
-- **`NumberReadsInput`** — Total number of raw sequencing reads fed into the Decombinator pipeline.
-- **`NumberReadsDecombined`** — Number of reads successfully assigned a TCR (T-cell receptor) rearrangement by Decombinator.
-- **`PercentReadsDecombined`** — `NumberReadsDecombined / NumberReadsInput`. Fraction of input reads successfully decombined. Note: reported as a fraction despite the name.
-- **`UniqueDCRsPassingFilters`** — Number of distinct DCR (Decombinator) identifiers (unique TCR rearrangements) remaining after quality/barcode filters.
-- **`TotalDCRsPassingFilters`** — Total count of DCR reads passing filters, including duplicates (i.e. summed abundances across all unique DCRs).
-- **`PercentDCRPassingFilters(withbarcode)`** — `TotalDCRsPassingFilters / NumberReadsDecombined`. Fraction of all decombined reads that pass filters with a barcode. Note: reported as a fraction despite the name.
-- **`UniqueDCRsPostCollapsing`** — Number of distinct DCRs remaining after UMI/barcode collapsing (error correction and deduplication).
-- **`TotalDCRsPostCollapsing`** — Total DCR count (with abundances) after collapsing.
-- **`PercentUniqueDCRsKept`** — `UniqueDCRsPostCollapsing / UniqueDCRsPassingFilters`. Fraction of unique clonotypes retained through collapsing. Note: reported as a fraction despite the name.
-- **`PercentTotalDCRsKept`** — `TotalDCRsPostCollapsing / TotalDCRsPassingFilters`. Fraction of total reads retained through collapsing. Note: reported as a fraction despite the name.
-- **`AverageInputTCRAbundance`** — Mean number of reads per unique TCR clonotype before collapsing.
-- **`AverageOutputTCRAbundance`** — Mean number of reads per unique TCR clonotype after collapsing.
-- **`AverageRNAduplication`** — `TotalDCRsPassingFilters / TotalDCRsPostCollapsing`. Average RNA duplication level; how many pre-collapse reads correspond to each post-collapse DCR on average.
+| Field                                   | Definition                                                                                                                                                           |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sample`                                | The sample name/identifier, derived from the log filename.                                                                                                           |
+| `NumberReadsInput`                      | Total number of raw sequencing reads fed into the Decombinator pipeline.                                                                                             |
+| `NumberReadsDecombined`                 | Number of reads successfully assigned a TCR (T-cell receptor) rearrangement by Decombinator.                                                                         |
+| `PercentReadsDecombined`                | `NumberReadsDecombined / NumberReadsInput`. Fraction of input reads successfully decombined. Note: reported as a fraction despite the name.                          |
+| `UniqueDCRsPassingFilters`              | Number of distinct DCR (Decombinator) identifiers (unique TCR rearrangements) remaining after quality/barcode filters.                                               |
+| `TotalDCRsPassingFilters`               | Total count of DCR reads passing filters, including duplicates (i.e. summed abundances across all unique DCRs).                                                      |
+| `PercentDCRPassingFilters(withbarcode)` | `TotalDCRsPassingFilters / NumberReadsDecombined`. Fraction of all decombined reads that pass filters with a barcode. Note: reported as a fraction despite the name. |
+| `UniqueDCRsPostCollapsing`              | Number of distinct DCRs remaining after UMI/barcode collapsing (error correction and deduplication).                                                                 |
+| `TotalDCRsPostCollapsing`               | Total DCR count (with abundances) after collapsing.                                                                                                                  |
+| `PercentUniqueDCRsKept`                 | `UniqueDCRsPostCollapsing / UniqueDCRsPassingFilters`. Fraction of unique clonotypes retained through collapsing. Note: reported as a fraction despite the name.     |
+| `PercentTotalDCRsKept`                  | `TotalDCRsPostCollapsing / TotalDCRsPassingFilters`. Fraction of total reads retained through collapsing. Note: reported as a fraction despite the name.             |
+| `AverageInputTCRAbundance`              | Mean number of reads per unique TCR clonotype before collapsing.                                                                                                     |
+| `AverageOutputTCRAbundance`             | Mean number of reads per unique TCR clonotype after collapsing.                                                                                                      |
+| `AverageRNAduplication`                 | `TotalDCRsPassingFilters / TotalDCRsPostCollapsing`. Average RNA duplication level; how many pre-collapse reads correspond to each post-collapse DCR on average.     |
 
 The order of the output summary will contain samples containing 'alpha' in their name, followed by those containing 'beta', followed by any additional samples that contain neither, all sorted alphabetically.
 
