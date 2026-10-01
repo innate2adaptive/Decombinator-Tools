@@ -26,9 +26,9 @@ echo $PWD
 PROJECTDIR=/SAN/colcc/tcr_decombinator
 TAGS=$PROJECTDIR/Decombinator-Tags-FASTAs/
 
-# Setup python enviroment
-source /share/apps/source_files/python/python-3.11.9.source
-source $PROJECTDIR/decombinator5_venv/bin/activate
+# Setup python environment
+source /share/apps/source_files/python/python-3.12.11.source
+source $PROJECTDIR/decombinator_v5_py12/bin/activate
 python3 -c 'import sys; print(".".join(map(str, sys.version_info[:3])))'
 echo "Decombinator version $(decombinator --version)"
 
